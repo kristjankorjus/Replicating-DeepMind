@@ -22,7 +22,3 @@ Random comments
 * Lets use Python 2.7.3 and 32 bit version
 * Unofficial Windows Binaries for Python Extension Packages: http://www.lfd.uci.edu/~gohlke/pythonlibs/
 * 
-
-Test
-----
-$$x_{1,2} = \frac{-b \pm \sqrt{b^2-4ac}}{2b}.$$
