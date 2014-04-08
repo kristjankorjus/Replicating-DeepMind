@@ -6,8 +6,9 @@
 % phi_i - pre-processed sequence
 % phi_t = {phi(x_1), a_1, phi(x_2), a2, ..., phi(x_t)}
 % theta - the "brain", i.e. parameters of the neural network
+% Q - calculates expected value of the move using NN
 % Q* - ?what's the difference between Q* and Q?
-% y_i - current + expected future rewards
+% y_i - current + expected future rewards for changing theta with radient descent 
 % gamma - discount factor
 
 %% Initialisations
@@ -16,11 +17,14 @@
 % constant epsilon = 0.05
 % constant gamma 
 
+
+%% Algorithm
 for game=1:M
 	% initialise sequence and preprocessing
 	% s1 = {x_1}
 	% phi1 = phi(s1)
 	
+	% t=time in one game, T = last time point of the game
 	for t=1:T
 		if(rand() <= 0.05)
 			% select random action a_t with probability 0.05
