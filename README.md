@@ -8,7 +8,7 @@ The plan
 --------
 
 * 31.03
-* 07.04   A very good plan is ready
+* 07.04   A very good plan is ready.
 * 14.04
 * 21.04
 * 28.04
