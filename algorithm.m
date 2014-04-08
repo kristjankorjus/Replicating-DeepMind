@@ -1,12 +1,12 @@
 %% Explanations of variables
-% x_i - a screenshot
+% x_i - a screen image
 % a_i - an action
-% s_t = {x_1, a_1, x_2, a_2, ..., x_t} - sequence of screenshots and actions
-% phi() - pre-processing function
-% phi_i - pre-processed sequence
-% phi_t = {phi(x_1), a_1, phi(x_2), a2, ..., phi(x_t)}
+% r_i - a reward
+% s_t = {x_1, a_1, x_2, ..., a_{t-1}, x_t} - sequence of images and actions
+% phi() - pre-processing function (smaller resolution, black and white, square)
+% phi_t = {phi(x_1), a_1, phi(x_2), ..., phi(x_t)} - pre-processed sequence
 % theta - the "brain", i.e. parameters of the neural network
-% Q - calculates expected value of the move using NN
+% Q - calculates expected value of the action using NN with theta
 % Q* - ?what's the difference between Q* and Q?
 % y_i - current + expected future rewards for changing theta with radient descent 
 % gamma - discount factor
@@ -33,20 +33,21 @@ for game=1:M
 		end;
 		
 		% execute a_t
-		% observe reward r_t and screenshot x_(t+1)
+		% observe reward r_t and image x_(t+1)
 		
-		% set s_(t+1) = [s_t, a_t, x_(t+1)]   (add performed action and new screenshot to the memory of this game)
-		% set phi_(t+1) = [phi, a_t, phi(x_(t+1)]   (add processed screenshot to processed memory of this game)
+		% set s_(t+1) = [s_t, a_t, x_(t+1)]   (add performed action and new image to the memory of this game)
+		% set phi_(t+1) = [phi, a_t, phi(x_(t+1)]   (add processed image to processed memory of this game)
 		
 		% store transition (phi_t, a_t, r_t, phi_t+1) into D
 		
 		% take a random minibatch (let's take 10) of transitions from D
 		for %each example in the minibatch
-			if %phi_(j+1) is terminal (game is over)
+			if %phi_(j+1) is terminal (game ended with the move)
 				y_j = r_j;
-			else
-				y_j = r_j + gamma * max_a' Q(phi_(j+1), a', theta)% (y_j = r_j + max return from the next step)
-			end;
+      else
+        % (y_j = r_j + max discounted return from the next step)
+				y_j = r_j + gamma * max_a' Q(phi_(j+1), a', theta)
+      end;
 		end;
 		
 		% Perform gradient descent step according to equation 3
