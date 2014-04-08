@@ -45,7 +45,7 @@ for game=1:M
 			end;
 		end;
 		
-		
+		% Perform gradient descent step according to equation 3
 		
 	end;
 end;
