@@ -1,5 +1,3 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-
 Some example 'LaTeXMathML' formulas:
 
 - latexmath:[$R_x = 10.0 \times \sin(R_\phi)$]
