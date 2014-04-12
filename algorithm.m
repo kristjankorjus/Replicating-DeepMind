@@ -13,7 +13,7 @@
 
 %% Initialisations
 % initialise memory D with size N
-% initialise random action-value function Q
+% initialise random action-value function Q (or may be its better to say that randomize theta, not Q)
 % constant epsilon = 0.05
 % constant gamma 
 
