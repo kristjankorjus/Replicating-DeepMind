@@ -1,7 +1,5 @@
 How to install things in this folder.
 
-
-
 _______________________________
 
 ALE-Arcade Learning Environment
@@ -19,15 +17,11 @@ In Ubuntu you can find them all in synaptic package manager (download the -dev l
 If you are using Windows, I guess you have to search the web yourself.
 If you are using Mac, ask Ilya.
 
-2.###ALE is ###
-Then go to:
-http://www.arcadelearningenvironment.org/downloads
-
-and download the latest version of ALE (0.4.3 or later). 
+2.### ALE is in libraries/alte_0.4.3 ###
 
 3.###INSTALL###
-Unzip the archive to wherever you want. This creates a folder that should contain two sub-folders "ale_0.4.3" and "ale_java_agent".
-Go to the foler ale_0.4.3 and open it in terminal.
+We have two sub-folders "ale_0.4.3" and "ale_java_agent".
+Go to the folder ale_0.4.3 and open it in terminal.
 
 On UNIX machines do:
 
