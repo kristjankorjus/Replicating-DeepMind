@@ -12,15 +12,14 @@ _______________________________
 1.###PREREQUISITES###:
 For our purposes we want to extract screen images from the games. To do so, we need to first install the following Simple DirectMedia Layer (SDL) libraries:
 
-1.1)libsdl
-1.2)libsdl-gfx
-1.3)libsdl-image
+1.1)libsdl-gfx
+1.2)libsdl-image
 
 In Ubuntu you can find them all in synaptic package manager (download the -dev libraries)
 If you are using Windows, I guess you have to search the web yourself.
 If you are using Mac, ask Ilya.
 
-2.###DOWNLOAD###
+2.###ALE is ###
 Then go to:
 http://www.arcadelearningenvironment.org/downloads
 
