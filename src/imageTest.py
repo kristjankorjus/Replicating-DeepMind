@@ -1,6 +1,3 @@
-
-
-
 f=open("pixels.dat", "r")
 pixs=f.readline()
 f.close()
