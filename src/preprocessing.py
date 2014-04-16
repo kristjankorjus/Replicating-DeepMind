@@ -20,6 +20,5 @@ def preprocessSequence(sequence):
     from PIL import Image
     for i in xrange(0,len(sequence),2):             # look at 0-th, 2nd, 4th etc element of the list
         ob = sequence[i]
-        #assert isinstance(ob, Image)                # make sure Python knows what type of object it has
         sequence[i] = preprocessImage(ob)           # preprocess and reassign
     return
