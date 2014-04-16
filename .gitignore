@@ -4,6 +4,8 @@ __pycache__/
 
 # C extensions
 *.so
+*.o
+*.d
 
 # Distribution / packaging
 .Python
@@ -55,3 +57,7 @@ docs/_build/
 # Dev environment
 .idea
 
+# ALE
+libraries/ale/ale
+libraries/ale/makefile
+libraries/ale/tags
