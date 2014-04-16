@@ -4,13 +4,9 @@
 #           ../bin/ale
 #
 
-# copy ALE files
-mkdir ../ale
-cp -R libraries/ale/* ../ale/
-
 # store current directory name and go in ALE directory
 cwd=$(pwd)
-cd ../ale
+cd ./libraries/ale
 
 # prepare Makefiles based on OS
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -36,4 +32,4 @@ make
 cd "$cwd"
 
 # run ALE
-../ale/ale -help
+./libraries/ale/ale -help
