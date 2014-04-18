@@ -6,8 +6,7 @@ Reproducing the results of "Playing Atari with Deep Reinforcement Learning" by D
 
 Installing Arcade Learning Environment (ALE)
 --------------------------------------------
-run ./install.sh from root directory of the reposity
-
-ALE will be comptiled in ../ale/
-
-You can run the binary as follows: ../ale/ale
+* Run ./install.sh from root directory of the reposity
+* ALE will be compiled in ./libraries/ale
+* The ALE executable is: ./libraries/ale/ale
+* ROMs are stored under ./libraries/ale/roms
