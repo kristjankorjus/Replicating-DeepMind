@@ -8,8 +8,7 @@ from PIL import Image
 
 img = Image.new('RGB', (160, 210), "black")  # create a new black image
 pixels = img.load()  # create the pixel map
- 
- 
+
 for i in range(len(pixs)/2):
     row = i % 160
     column = i/160
