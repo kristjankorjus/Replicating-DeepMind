@@ -18,10 +18,12 @@ os.system(
 fin = open('ale_fifo_out')
 fout = open('ale_fifo_in', 'w')
 
-size = fin.readline()[:-1].split("-")  # saves the image sizes (160*210 for breakout
+size = fin.readline()[:-1].split("-")  # saves the image sizes (160*210) for breakout
 
 #first thing we send to ALE is the output options- we want to get only image data (hence the zeros)
 fout.write("1,0,0,0\n")
+# probably we need fout.write("1,0,0,1\n") in order to understand "game over!"
+
 fout.flush()  # send the lines written to pipe
 fin.readline()   # read what ALE responds- it should be the initial game screen
 

@@ -62,6 +62,7 @@ libraries/ale/ale
 libraries/ale/makefile
 libraries/ale/tags
 state/
+src/ale_fifo*
 
 # Mac .DS_Store
 .DS_Store
