@@ -10,7 +10,8 @@ os.system("mkfifo ale_fifo_out")
 os.system("mkfifo ale_fifo_in")
 
 #launch ALE with appropriate commands in the background
-os.system("./ale -game_controller fifo_named -run_length_encoding true -display_screen true roms/breakout.bin &")
+os.system(
+    './../libraries/ale/ale -game_controller fifo_named -run_length_encoding true -display_screen true ../libraries/ale/roms/breakout.bin &')
 
 
 #oppen communication with pipes
