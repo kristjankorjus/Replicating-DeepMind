@@ -56,6 +56,7 @@ docs/_build/
 
 # Dev environment
 .idea/
+.idea/workspace.xml
 
 # ALE
 libraries/ale/ale
