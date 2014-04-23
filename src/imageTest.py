@@ -17,6 +17,19 @@ for i in range(len(pixs)/2):
     
 img.show()
 
-from preprocessing import preprocessImage
 
-preprocessImage(img)
+
+# Example 1: take one PIL.Image file, preprocess and get its pixel array
+from preprocessing import preprocessImage
+img2 = preprocessImage(img)
+pixels = img2.load()
+
+# Example 2: take a sequence that DOESN'T contain actions and preprocess the images in-place
+from preprocessing import preprocessSequenceWithActions
+sequence = [img.copy(),45,img.copy(),'thisdoesntmatter',img.copy(),'this neither'] #,deepcopy(img),'thisdoesntmatter',deepcopy(img),deepcopy(img)]
+sequence = preprocessSequenceWithActions(sequence)
+
+# Example 3: take a sequence that DOES contain actions and preprocess the images in-place
+from preprocessing import preprocessSequenceNoActions
+sequence = [img.copy(),img.copy(),img.copy()]
+sequence = preprocessSequenceNoActions(sequence)
