@@ -14,7 +14,7 @@ for i in range(len(pixs)/2):
     column = i/160
     hex = pixs[i*2:(i+1)*2]
     pixels[row, column] = (int(hex, 16), int(hex, 16), int(hex, 16))
-    
+
 img.show()
 
 
