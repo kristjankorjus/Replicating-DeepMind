@@ -9,7 +9,10 @@ import numpy as np
 
 img = Image.new('RGB', (160, 210), "black")  # create a new black image
 pixels = img.load()  # create the pixel map
-colMat = np.loadtxt("Grayscale.dat")
+
+# Load the hardcoded grayscale array
+from grayscale import getGrayscaleArray
+colMat = getGrayscaleArray()
 
 for i in range(len(pixs)/2):
     row = i % 160
