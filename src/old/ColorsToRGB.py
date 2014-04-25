@@ -67,4 +67,7 @@ matr=np.loadtxt("Grayscale.dat") #this is how you can read the saved file
 #print matr
 #print matr1
 #print matr1==matr
-
+import pylab
+import matplotlib.cm as cm
+pylab.imshow(matr, cmap = cm.Greys_r, interpolation='none')
+pylab.show()

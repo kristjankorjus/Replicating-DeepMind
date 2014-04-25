@@ -151,9 +151,12 @@ for i in range (5000):
 
     if game_over==1:
         print "ALE tells us the episode has ended, that means we lost all our lives :("
-        time.sleep(5.0) #lets take a break, so we can realize that this happened (in case it happens in the wrong place)
-        #let's do something about it!!!
-    
+        time.sleep(1.0) #lets take a break, so we can realize that this happened (in case it happens in the wrong place)
+        a="0,0\n" #it seems we need to send "NOOP, NOOP" (cf line 55, line 90.. in internal_controller.cpp in ale/src/controllers) to relaunch, but this does not work!!!
+        fout.write(a)
+        fout.flush()
+        fin.readline()
+
     if reward>0:
         real_cumulated_reward+=reward
         #article says all positive rewards are considered equal to 1
@@ -177,7 +180,12 @@ for i in range (5000):
         lastAction=a
     else: 
         #print "ball is gone, SHOOT!"
-        a="1,1\n"
+        if random.random()<0.9:
+            a="1,1\n"
+        else:
+            a="0,0\n"
+            
+    a="4,0\n"
 
 
     
