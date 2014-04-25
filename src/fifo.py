@@ -21,7 +21,7 @@ def findBall(pixs):
    
     else:
         print "Ball is gone and we need to wait"
-        time.sleep(0.5)
+        time.sleep(0.2)
         x, y=0, 0
     
     #print "ball location is; ", x, y
@@ -139,9 +139,13 @@ lastAction="4,0\n" #doesnt matter
 stopped=False #if the paddle was told to stop moving last timestep
 
 cumulated_reward=0
-real_cumulated_reward=0
 
-for i in range (5000):
+
+
+max_nr_of_episodes=3 #how many episodes to run????
+next_episode_nr=1 #count of episodes
+
+for i in range (10000):
     img,  episode_info= fin.readline()[:-2].split(":")
     episode_info=episode_info.split(",")
 
@@ -150,20 +154,31 @@ for i in range (5000):
 
 
     if game_over==1:
-        print "ALE tells us the episode has ended, that means we lost all our lives :("
-        time.sleep(1.0) #lets take a break, so we can realize that this happened (in case it happens in the wrong place)
-        a="0,0\n" #it seems we need to send "NOOP, NOOP" (cf line 55, line 90.. in internal_controller.cpp in ale/src/controllers) to relaunch, but this does not work!!!
-        fout.write(a)
-        fout.flush()
-        fin.readline()
+        cumulated_reward=0
+        next_episode_nr+=1
+        
+        if next_episode_nr>max_nr_of_episodes:
+            #we have reached max, we want to DIE!!!
+            fout.close()
+            fin.close()
+            break
+        
+        else:
+            print "ALE tells us the episode has ended, that means we lost all our lives :("
+            time.sleep(1.0) #lets take a break, so we can realize that this happened (in case it happens in the wrong place)
+            a="45,45\n" #it seems we need to send "NOOP, NOOP" (cf line 55, line 90.. in internal_controller.cpp in ale/src/controllers) to relaunch, but this does not work!!!
+            fout.write(a)
+            fout.flush()
+            fin.readline()
+            game_over=0
+
 
     if reward>0:
-        real_cumulated_reward+=reward
         #article says all positive rewards are considered equal to 1
         reward=1
         cumulated_reward+=1
-        print "got some points! The cumulated scores so far are: ", real_cumulated_reward,"   ->",  cumulated_reward
-        time.sleep(0.5)
+        print "got some points! The cumulated scores so far are: ",  cumulated_reward
+        time.sleep(0.2)
         #now we have to use this reward to update the network (to somehow update the Q-value of the last (state, action) pair   -- Q=reward+max(Q|a) )
 
     x, y=findBall(img) #sends the ball coordinates, if ball was not found, sends "0,0"
@@ -178,14 +193,12 @@ for i in range (5000):
         bx, by= x, y #update ball location, (otherwise use the pervious location)
         a, stopped=chooseAction(bx, by, px, py, lastAction, stopped)
         lastAction=a
+
     else: 
         #print "ball is gone, SHOOT!"
-        if random.random()<0.9:
-            a="1,1\n"
-        else:
-            a="0,0\n"
-            
-    a="4,0\n"
+        a="1,1\n"
+        
+
 
 
     
