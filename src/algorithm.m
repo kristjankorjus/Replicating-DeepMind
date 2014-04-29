@@ -44,11 +44,11 @@ for game=1:M
 		for %each example in the minibatch
 			if %phi_(j+1) is terminal (game ended with the move)
 				y_j = r_j;
-      else
+        else
         % (y_j = r_j + max discounted return from the next step)
 				y_j = r_j + gamma * max_a' Q(phi_(j+1), a', theta)
-      end;
-		end;
+        end;
+
 		
 		% Perform gradient descent step according to equation 3
 		
