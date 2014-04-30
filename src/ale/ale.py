@@ -5,7 +5,7 @@ import numpy as np
 import preprocess as pre
 
 class ALE:
-    actions=["0,0\n", "1,0\n","3,0\n","4,0\n"]
+    actions=[np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
     current_reward=0
     next_screen=""
     game_over=False
@@ -16,7 +16,7 @@ class ALE:
     self.fin=""
     self.fout=""
     
-    def __init__(self,  memory, display_screen="true", skip_frames=4):
+    def __init__(self,  memory, display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin &'):
         self.display_screen=display_screen
         self.skip_frames=skip_frames
         self.memory=memory
@@ -72,7 +72,7 @@ class ALE:
     
     
     def move(self, action):
-        self.fout.write(action)
+        self.fout.write(str(action)+",0\n")
         self.fout.flush()
         self.next_image, episode_info = fin.readline()[:-2].split(":")   # read from ALE: the initial game screen + episode info
         self.game_over=bool(int(episode_info.split(",")[0]))
