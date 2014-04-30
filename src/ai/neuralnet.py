@@ -9,7 +9,7 @@ import random
 
 class NeuralNet:
 
-    def getAction(images):
+    def get_action(images):
         '''
         Images is 3D matrix: 4 x 84 x 84
         '''

@@ -67,7 +67,7 @@ class ALE:
         self.game_over=0 # just in case, but new_game should do it anyway
         
 
-    def store_transition(self, action):
+    def store_step(self, action):
         self.memory.add(action, reward, pre.process(self.next_image))
     
     
