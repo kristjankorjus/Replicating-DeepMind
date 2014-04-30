@@ -1,0 +1,10 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{MKS{\etalchar{+}}13}
+
+\bibitem[MKS{\etalchar{+}}13]{mnih2013playing}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis
+  Antonoglou, Daan Wierstra, and Martin Riedmiller.
+\newblock Playing atari with deep reinforcement learning.
+\newblock {\em arXiv preprint arXiv:1312.5602}, 2013.
+
+\end{thebibliography}

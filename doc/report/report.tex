@@ -1,0 +1,200 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{pst-plot}
+\usepackage{graphicx}
+\usepackage{endnotes}
+\usepackage{graphics}
+\usepackage{floatflt}
+\usepackage{wrapfig}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{pdflscape}
+\usepackage{multicol}
+\usepackage[bottom]{footmisc}
+
+\usepackage{hyperref}
+\hypersetup{pdfborder={0 0 0 0}}
+
+\pdfpagewidth 210mm
+\pdfpageheight 297mm 
+\setlength\topmargin{0mm}
+\setlength\headheight{0mm}
+\setlength\headsep{0mm}
+\setlength\textheight{250mm}	
+\setlength\textwidth{159.2mm}
+\setlength\oddsidemargin{0mm}
+\setlength\evensidemargin{0mm}
+\setlength\parindent{0mm}
+\setlength\parskip{3mm}
+
+\graphicspath{{./images/}}
+
+
+
+%
+% Title
+%
+\begin{document}
+\begin{center}
+	{\Large
+	University of Tartu\\
+	Faculty of Mathematics and Computer Science\\
+	Institute of Computer Science\\}
+	\vspace{6cm}
+	{\Large Kristjan Korjus, Ilya Kuzovkin, Ardi Tampuu, Taivo Pungas}\\
+	\vspace{1.0cm}
+	{\Huge Replicating the Paper ``Playing Atari with Deep Reinforcement Learning"\textsuperscript{\Large{\cite{mnih2013playing}}}}\\
+	\vspace{0.5cm}
+	{\Large Technical Report}\\
+	\vspace{1.0cm}
+	{\large MTAT.03.291 Introduction to Computational Neuroscience}
+	
+\end{center}
+\vspace{9cm}
+\begin{center}
+	{\large Tartu 2014}
+\end{center}
+\thispagestyle{empty}
+\pagebreak
+
+
+
+%
+% Table of contents
+%
+\thispagestyle{empty}
+\tableofcontents
+\pagebreak
+
+
+
+%
+% Introduction
+%
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+In the recent years the popularity of the method called \emph{deep learning} [REF] has increased noticeably in the machine learning community. Deep leaning was successfully applied to speech regonition [REF], something else [REF] and something else [REF]. In all these studies the performance of the resulting system was better than other machine learning methods were able to achieve so far.
+
+The core of deep learning method is an artificial neural network. One of the properties, which gives this family of learning algorithms a special place, is the ability to extract ``meaningful" (from the human perspective) \emph{concepts} from the data by combining the features based on the structure of the data. The extracted concepts sometimes have clear interpretation and that makes us feel as if machine indeed has \emph{learned} something. Here we step into the realm of artificial intelligence, the possibility of which never stops to fascinate our minds.
+
+One of the recent works, which brings together deep learning and artificial intelligence is a paper ``Playing Atari with Deep Reinforcement Learning"\cite{mnih2013playing} published by DeepMind\footnote{\url{http://deepmind.com}} company. The paper describes a system, which combines deep learning methods and \emph{reinforcement learning} in order to create a system that is able to learn how to play simple computer games. It is worth mentioning that the system has access only to the visual information (screen of the game) and the scores. Based on these two inputs the system learns to understand which moves are good and which are bad depending on the situation on the screen. Notice that the human player uses exactly same information to evaluate his performance and adapt his playing strategy. The reported result shows that the system was able to master several different games and play some of them better than the human player.
+
+This result can be seen as a step forward to the truly intelligent machines and thus it fascinates us. The goal of this project is to create an open-source analogue of such a system using the description provided in the paper.
+
+
+
+%
+% Bird-eye view
+%
+\pagebreak
+\section{Bird-eye view on the system}
+Before we go into the details let us describe the overall architecture of the system and show how the building blocks are put together. 
+
+\subsection{The task}
+Games look like this [PICTURE], system receives picture, makes move, receives score update and based on that info it has to learn, blabla
+
+\subsection{Reinforcement learning}
+This is a techinque... 
+
+\subsubsection{Exploration-exploitation}
+multiarmed bandits
+
+\subsection{Neural network}
+general description, we have input -- images, scores (where those go?), then hidden layers which correspond to blabla and output layer -- actions. Learning happens by updating weights blabla
+
+\subsection{Learning process}
+gradient descent blabla
+
+
+
+%
+% Components
+%
+\pagebreak
+\section{Components of the system}
+here goes the detailed description of everything (aka the hardest part)
+
+\subsection{Convolutional neural network}
+...
+
+\subsection{Q-learning}
+...
+
+\subsection{Something else}
+...
+
+
+\subsection{And once again how all those things are put together}
+
+
+
+%
+% Implementation
+%
+\pagebreak
+\section{Implementation details}
+We use python, ALE, whatever else
+
+\subsection{Agent}
+...
+
+\subsection{Memory}
+...
+
+\subsection{Any other implementational stuff which is worth describing}
+...
+
+
+%
+% Results
+%
+\pagebreak
+\section{Results}
+Our system rules!
+
+\subsection{Performance measures}
+
+\subsection{Comparison to human player}
+...
+
+\subsection{Comparison to the paper}
+...
+
+\subsection{Something else}
+...
+
+\subsection{Applications and future blah}
+...
+
+
+
+%
+% Appendicies
+%
+\pagebreak
+\section*{Appendix A: Running instructions}
+\addcontentsline{toc}{section}{Appendix A: Running instructions}
+to test the system you should do this and that
+
+you will see that blabla
+
+this will make you happy
+
+also go to github read wiki/code there for more details
+
+
+
+%
+% Bibliography
+%
+\pagebreak
+\addcontentsline{toc}{section}{Biliography}
+\bibliographystyle{alpha}
+\bibliography{report}
+
+\end{document}

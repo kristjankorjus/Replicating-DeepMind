@@ -11,6 +11,6 @@ class NeuralNet:
 
     def get_action(images):
         '''
-        Images is 3D matrix: 4 x 84 x 84
+        Image is a 3D matrix: 4 x 84 x 84
         '''
         return random.randint(0, 4)
