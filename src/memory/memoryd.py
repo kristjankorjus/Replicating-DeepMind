@@ -22,7 +22,7 @@ class MemoryD:
     time    = None
 
     #: global index counter
-    count   = 0
+    count   = None
 
     def __init__(self, N):
         '''
@@ -33,16 +33,17 @@ class MemoryD:
         self.actions = np.zeros((N,), dtype=np.uint8)
         self.rewards = np.zeros((N,), dtype=np.uint8)
         self.time    = np.zeros((N,), dtype=np.uint32)
-        self.count   = 0
+        self.count   = -1
 
     def add_first(self, next_screen):
         '''
         When a new game start we add initial game screen to the memory
         @param screen: 84 x 84 np.uint8 matrix
         '''
-        self.screen[self.count + 1] = next_screen
+        self.screens[self.count + 1] = next_screen
         self.time[self.count + 1] = 0
         self.count += 1
+
 
     def add(self, action, reward, next_screen):
         '''
@@ -54,7 +55,7 @@ class MemoryD:
         self.actions[self.count] = action
         self.rewards[self.count] = reward
         self.time[self.count + 1] = self.time[self.count] + 1
-        self.screen[self.count + 1]  = next_screen
+        self.screens[self.count + 1]  = next_screen
         self.count += 1
 
     def add_last(self):
@@ -63,8 +64,8 @@ class MemoryD:
         values. It is useful to think that at this time moment agent is looking at
         "Game Over" screen
         '''
-        self.actions[self.count] = None
-        self.rewards[self.count] = None
+        self.actions[self.count] = 100
+        self.rewards[self.count] = 100
 
     def get_minibatch(self, size):
         '''
@@ -77,7 +78,7 @@ class MemoryD:
         #: Pick random n indices
         indices = [random.randint(0, self.count - 1) for i in range(size)]
         for i in indices:
-            if self.actions[i] is not None:
+            if self.actions[i] != 100:
                 transitions.append({'prestate': self.get_state(i),
                                     'action': self.actions[i],
                                     'reward': self.rewards[i],
