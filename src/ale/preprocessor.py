@@ -39,7 +39,11 @@ class Preprocessor:
         new_size = 84, 84
         img.thumbnail(new_size)
 
-        return img
+        # Get pixel data again
+        raw_pixels = np.asarray(img, dtype=np.uint8);
+
+        # Return only R value from RGB representation because R=G=B here.
+        return raw_pixels[:,:,0]
 
 
     def get_grayscale_array(self):

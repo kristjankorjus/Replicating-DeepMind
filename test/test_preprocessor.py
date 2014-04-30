@@ -20,8 +20,5 @@ f.close()
 # Preprocess image
 img = pre.process(pixs)
 
-# Get pixels from the image
-pao = img.load() # get the pixel access object of the image
-data = np.asarray(img)
-print(data[1][1])
-#img.show()
+# Print the resulting array
+print(img)
