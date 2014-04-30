@@ -6,6 +6,7 @@ This is the main class where all thing are put together
 
 from ai.neuralnet import NeuralNet
 from memory.memoryd import MemoryD
+from ale.ale import ALE
 import random
 
 class Main:
@@ -17,7 +18,7 @@ class Main:
     def __init__(self):
         self.memory = MemoryD(self.memory_size)
         self.nnet = NeuralNet()
-        self.ale = None
+        self.ale = ALE(self.memory)
 
     def compute_epsilon(self, frames_played):
         """
