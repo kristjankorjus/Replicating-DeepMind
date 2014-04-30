@@ -65,7 +65,7 @@ class Main:
 
             # After "game over" increase the number of games played
             games_played += 1
-            print games_played
+
             # And do stuff after end game (store information, let ALE know etc)
             self.ale.end_game()
 

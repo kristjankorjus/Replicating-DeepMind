@@ -49,16 +49,7 @@ class ALE:
         self.next_image, episode_info = self.fin.readline()[:-2].split(":")   # read from ALE: the initial game screen + episode info
         self.game_over = bool(int(episode_info.split(",")[0]))
         self.current_reward = int(episode_info.split(",")[1])
-        while self.game_over:
-            self.fout.write("1,0\n")
-            self.fout.flush()
-            self.next_image, episode_info = self.fin.readline()[:-2].split(":")
-            self.game_over = bool(int(episode_info.split(",")[0]))
-            self.current_reward = int(episode_info.split(",")[1])
-            print "waiting"
 
-        print "done"
-        
         #: preprocess the image and the image to memory D
         self.memory.add_first(self.preprocessor.process(self.next_image))
         
@@ -67,6 +58,7 @@ class ALE:
         # first command has to be 1,0 or 1,1, because the game starts when you press "fire!",
         self.fout.write("1,0\n")
         self.fout.flush()
+        self.fin.readline()
         
     def end_game(self):
         #: tell the memory that we lost
