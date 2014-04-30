@@ -2,7 +2,7 @@
 
 import os
 import numpy as np
-import preprocess as pre
+from preprocessor import Preprocessor
 
 class ALE:
     actions=[np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
@@ -13,8 +13,9 @@ class ALE:
     skip_frames=4
     display_screen="true"
     game_ROM='../libraries/ale/roms/breakout.bin &'
-    self.fin=""
-    self.fout=""
+    fin=""
+    fout=""
+    preprocessor = None
     
     def __init__(self,  memory, display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin &'):
         self.display_screen=display_screen
@@ -41,15 +42,18 @@ class ALE:
         self.fout.write("1,0,0,1\n")
         self.fout.flush()  # send the lines written to pipe
 
+        # initialise preprocessor
+        self.preprocessor = Preprocessor()
+
         
     
     def new_game(self):
-        self.next_image, episode_info = fin.readline()[:-2].split(":")   # read from ALE: the initial game screen + episode info
+        self.next_image, episode_info = self.fin.readline()[:-2].split(":")   # read from ALE: the initial game screen + episode info
         self.game_over=bool(int(episode_info.split(",")[0]))
         self.reward= int(episode_info.split(",")[1])
         
         #: preprocess the image and the image to memory D
-        self.memory.add_first(pre.process(self.next_image))
+        self.memory.add_first(self.preprocessor.process(self.next_image))
         
         
         #: send the fist command
@@ -68,13 +72,13 @@ class ALE:
         
 
     def store_step(self, action):
-        self.memory.add(action, reward, pre.process(self.next_image))
+        self.memory.add(action, self.current_reward, self.preprocessor.process(self.next_image))
     
     
     def move(self, action):
         self.fout.write(str(action)+",0\n")
         self.fout.flush()
-        self.next_image, episode_info = fin.readline()[:-2].split(":")   # read from ALE: the initial game screen + episode info
+        self.next_image, episode_info = self.fin.readline()[:-2].split(":")   # read from ALE: the initial game screen + episode info
         self.game_over=bool(int(episode_info.split(",")[0]))
         self.reward= int(episode_info.split(",")[1])
         
