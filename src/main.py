@@ -60,7 +60,7 @@ class Main:
                 self.nnet.train()
 
             # After "game over" increase the number of games played
-            games_played++
+            games_played += 1
 
             # And do stuff after end game (store information, let ALE know etc)
             self.ale.end_game()
