@@ -9,13 +9,13 @@ from memory.memoryd import MemoryD
 import random
 
 class Main:
-
+    memory_size = 1000000   # how many transitions to keep in memory?
     memory = None
     nnet = None
     ale = None
 
     def __init__(self):
-        self.memory = MemoryD(1000000)
+        self.memory = MemoryD(self.memory_size)
         self.nnet = NeuralNet()
         self.ale = None
 
@@ -24,7 +24,7 @@ class Main:
         From the paper: "The behavior policy during training was epsilon-greedy
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         """
-        return max(1 - frames_played / 1000000, 0.1)
+        return max(1 - frames_played / self.memory_size, 0.1)
 
     def play_games(self, n):
 
