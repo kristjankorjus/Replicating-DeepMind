@@ -9,7 +9,7 @@ from memory.memoryd import MemoryD
 import random
 
 class Main:
-    memory_size = 1000000   # how many transitions to keep in memory?
+    memory_size = 1000   # how many transitions to keep in memory?
     memory = None
     nnet = None
     ale = None
