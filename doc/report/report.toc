@@ -1,5 +1,5 @@
 \contentsline {section}{Introduction}{3}{section*.2}
-\contentsline {section}{\numberline {1}Bird-eye view on the system}{4}{section.1}
+\contentsline {section}{\numberline {1}A bird's-eye view of the system}{4}{section.1}
 \contentsline {subsection}{\numberline {1.1}The task}{4}{subsection.1.1}
 \contentsline {subsection}{\numberline {1.2}Reinforcement learning}{4}{subsection.1.2}
 \contentsline {subsubsection}{\numberline {1.2.1}Exploration-exploitation}{4}{subsubsection.1.2.1}
@@ -13,7 +13,8 @@
 \contentsline {section}{\numberline {3}Implementation details}{6}{section.3}
 \contentsline {subsection}{\numberline {3.1}Agent}{6}{subsection.3.1}
 \contentsline {subsection}{\numberline {3.2}Memory}{6}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Any other implementational stuff which is worth describing}{6}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.3}Preprocessing}{6}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Any other implementational stuff which is worth describing}{6}{subsection.3.4}
 \contentsline {section}{\numberline {4}Results}{7}{section.4}
 \contentsline {subsection}{\numberline {4.1}Performance measures}{7}{subsection.4.1}
 \contentsline {subsection}{\numberline {4.2}Comparison to human player}{7}{subsection.4.2}

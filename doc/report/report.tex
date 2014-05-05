@@ -6,6 +6,7 @@
 \usepackage{graphicx}
 \usepackage{endnotes}
 \usepackage{graphics}
+\usepackage{graphicx}
 \usepackage{floatflt}
 \usepackage{wrapfig}
 \usepackage{amsfonts}
@@ -92,11 +93,19 @@ This result can be seen as a step forward to the truly intelligent machines and 
 % Bird-eye view
 %
 \pagebreak
-\section{Bird-eye view on the system}
-Before we go into the details let us describe the overall architecture of the system and show how the building blocks are put together. 
+\section{A bird's-eye view of the system}
+Before we go into the details, let us describe the overall architecture of the system and show how the building blocks are put together. 
 
 \subsection{The task}
-Games look like this [PICTURE], system receives picture, makes move, receives score update and based on that info it has to learn, blabla
+
+The system receives a picture of a game screen (an example is shown in Figure \ref{fig:breakoutscreen}) and chooses an action to take. It then executes this action and is told whether the score increased, decreased or did not change. Based on this information and playing a large number of games, the system needs to learn to improve its performance in the game.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.5cm]{fig_gamescreen}
+\caption{A game screen of Breakout}
+\label{fig:breakoutscreen}
+\end{figure}
 
 \subsection{Reinforcement learning}
 This is a techinque... 
@@ -138,13 +147,33 @@ here goes the detailed description of everything (aka the hardest part)
 %
 \pagebreak
 \section{Implementation details}
-We use python, ALE, whatever else
+Programming language: Python 2.7 (32-bit).
+
+Python libraries: Pillow, NumPy, Theano.
+
+ATARI emulation environment: ALE (Arcade Learning Environement).
 
 \subsection{Agent}
 ...
 
 \subsection{Memory}
 ...
+
+\subsection{Preprocessing}
+\label{subsection_preproc}
+The game screens are preprocessed by first cropping the original 160x210-pixel image to a 160x160 region of interest, which is then downscaled to a 84x84 image.
+
+The colors from ATARI's NTSC palette are converted to RGB using a conversion table
+\footnote{\url{http://www.biglist.com/lists/stella/archives/200109/msg00285.html}}. The RGB representation is then converted to grayscale according to the weighted combination $0.21r + 0.71g + 0.07b$. This should produce a representation close to human perception (humans are more sensitive to green than other colours). An example of a preprocessed image is shown in Figure \ref{fig:breakoutpreprocessed}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.5cm]{fig_preprocessedscreen}
+\caption{A preprocessed game screen of Breakout}
+\label{fig:breakoutpreprocessed}
+\end{figure}
+
+
 
 \subsection{Any other implementational stuff which is worth describing}
 ...
