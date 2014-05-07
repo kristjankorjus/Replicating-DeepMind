@@ -138,6 +138,18 @@ gradient descent blabla
 \section{Components of the system}
 here goes the detailed description of everything (aka the hardest part)
 
+
+\subsection{Launching and communicating with ALE}
+
+Just as we, humans, exchange information with a computer game by seeing the computer screen(input) and pressing the keys (output actions), also the DeepMind needs to communicate with the Arcade Learning Environment that hosts the game.
+\paragraph{}
+The communication with ALE is achieved using two first-in-first out pipes which must be created before ALE program is launched. We create the pipes and launch ALE using the os package of Python. The parameters given to ALE at execution must specify the way we want to communicate with ALE (FIFO pipes) and the location to the binary file containing the game to run (Breakout). In addition, we choose that we want ALE to return unencoded images, that only every 4th frame should be sent to us and that the game window should be made visible.
+
+
+\paragraph{}
+The actual communication starts with a "handshake" phase, where we define the desired inputs (screen image and episode information) and ALE responds by informing us about the dimensions of the image. Thereafter the conversation between ALE and our agent consists in reading and deciphering inputs from FIFO_in pipe and sending the chosen actions back through FIFO_out pipe. The information is read from pipes as one long String, so deciphering is needed (cutting the input and converting the pieces into appropriate types). Similarly, the chosen action has to be transformed to an output string of specific format. If a game is lost, specific "reset" signal is sent to start the next game. When a desired number of games is played the communication with ALE can be terminated by closing the communication pipes.  
+
+
 \subsection{Convolutional neural network}
 ...
 
