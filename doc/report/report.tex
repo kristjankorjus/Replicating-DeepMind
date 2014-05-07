@@ -118,7 +118,9 @@ When the algorithm chooses between possible actions, it picks a "learned" action
 multiarmed bandits
 
 \subsection{Neural network}
-The system uses a neural network to assign an expected reward value to each possible action. The input to the network at any time point consists of the last four preprocessed game screens the system received. This input is then passed through three successive hidden layers to the output layer. The output layer has one node for each possible action and the activation of those nodes indicates the expected reward from each of the possible actions.
+The system uses a neural network to assign an expected reward value to each possible action. The input to the network at any time point consists of the last four preprocessed game screens the system received. This input is then passed through three successive hidden layers to the output layer. 
+
+The output layer has one node for each possible action and the activation of those nodes indicates the expected reward from each of the possible actions - here, the action with the highest expected reward is selected for execution.
 
 \subsection{Learning process}
 The system learns, i.e. improves the accuracy of its predictions, by updating the weights of connections between nodes in the neural network.
