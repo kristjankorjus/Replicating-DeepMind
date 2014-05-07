@@ -103,7 +103,7 @@ The system receives a picture of a game screen (an example is shown in Figure \r
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5cm]{fig_gamescreen}
-\caption{A game screen of Breakout}
+\caption{A game screen of Breakout.}
 \label{fig:breakoutscreen}
 \end{figure}
 
@@ -113,14 +113,18 @@ This is a techinque...
 \subsubsection{Exploration-exploitation}
 When the algorithm chooses between possible actions, it picks a "learned" action with probability $1-\epsilon$ and a random action with probability $\epsilon$. The value of $\epsilon$ is gradually decreased as the algorithm learns to play better.
 
-[this needs work]
+[needs work]
 
 multiarmed bandits
 
 \subsection{Neural network}
-general description, we have input -- images, scores (where those go?), then hidden layers which correspond to blabla and output layer -- actions. Learning happens by updating weights blabla
+The system uses a neural network to assign an expected reward value to each possible action. The input to the network at any time point consists of the last four preprocessed game screens the system received. This input is then passed through three successive hidden layers to the output layer. The output layer has one node for each possible action and the activation of those nodes indicates the expected reward from each of the possible actions.
 
 \subsection{Learning process}
+The system learns, i.e. improves the accuracy of its predictions, by updating the weights of connections between nodes in the neural network.
+
+[needs expansion]
+
 gradient descent blabla
 
 
@@ -174,7 +178,7 @@ The colors from ATARI's NTSC palette are converted to RGB using a conversion tab
 \begin{figure}[h]
 \centering
 \includegraphics[width=2.5cm]{fig_preprocessedscreen}
-\caption{A preprocessed game screen of Breakout}
+\caption{A preprocessed game screen of Breakout.}
 \label{fig:breakoutpreprocessed}
 \end{figure}
 
