@@ -10,8 +10,13 @@
 \contentsline {paragraph}{}{6}{section*.3}
 \contentsline {paragraph}{}{6}{section*.4}
 \contentsline {subsection}{\numberline {2.2}Convolutional neural network}{6}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Q-learning}{6}{subsection.2.3}
-\contentsline {subsection}{\numberline {2.4}Something else}{6}{subsection.2.4}
+\contentsline {paragraph}{}{6}{section*.5}
+\contentsline {paragraph}{}{7}{section*.6}
+\contentsline {paragraph}{}{7}{section*.7}
+\contentsline {paragraph}{}{7}{section*.8}
+\contentsline {paragraph}{}{7}{section*.9}
+\contentsline {subsection}{\numberline {2.3}Q-learning}{7}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Something else}{7}{subsection.2.4}
 \contentsline {subsection}{\numberline {2.5}And once again how all those things are put together}{7}{subsection.2.5}
 \contentsline {section}{\numberline {3}Implementation details}{8}{section.3}
 \contentsline {subsection}{\numberline {3.1}Agent}{8}{subsection.3.1}
@@ -24,5 +29,5 @@
 \contentsline {subsection}{\numberline {4.3}Comparison to the paper}{9}{subsection.4.3}
 \contentsline {subsection}{\numberline {4.4}Something else}{9}{subsection.4.4}
 \contentsline {subsection}{\numberline {4.5}Applications and future blah}{9}{subsection.4.5}
-\contentsline {section}{Appendix A: Running instructions}{10}{section*.5}
-\contentsline {section}{Bibliography}{11}{section*.5}
+\contentsline {section}{Appendix A: Running instructions}{10}{section*.10}
+\contentsline {section}{Bibliography}{11}{section*.10}

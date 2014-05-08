@@ -1,26 +1,26 @@
-\BOOKMARK [1][-]{section*.2}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.1}{A bird's-eye view of the system}{}% 2
-\BOOKMARK [2][-]{subsection.1.1}{The task}{section.1}% 3
-\BOOKMARK [2][-]{subsection.1.2}{Reinforcement learning}{section.1}% 4
-\BOOKMARK [3][-]{subsubsection.1.2.1}{Exploration-exploitation}{subsection.1.2}% 5
-\BOOKMARK [2][-]{subsection.1.3}{Neural network}{section.1}% 6
-\BOOKMARK [2][-]{subsection.1.4}{Learning process}{section.1}% 7
-\BOOKMARK [1][-]{section.2}{Components of the system}{}% 8
-\BOOKMARK [2][-]{subsection.2.1}{Launching and communicating with ALE}{section.2}% 9
-\BOOKMARK [2][-]{subsection.2.2}{Convolutional neural network}{section.2}% 10
-\BOOKMARK [2][-]{subsection.2.3}{Q-learning}{section.2}% 11
-\BOOKMARK [2][-]{subsection.2.4}{Something else}{section.2}% 12
-\BOOKMARK [2][-]{subsection.2.5}{And once again how all those things are put together}{section.2}% 13
-\BOOKMARK [1][-]{section.3}{Implementation details}{}% 14
-\BOOKMARK [2][-]{subsection.3.1}{Agent}{section.3}% 15
-\BOOKMARK [2][-]{subsection.3.2}{Memory}{section.3}% 16
-\BOOKMARK [2][-]{subsection.3.3}{Preprocessing}{section.3}% 17
-\BOOKMARK [2][-]{subsection.3.4}{Any other implementational stuff which is worth describing}{section.3}% 18
-\BOOKMARK [1][-]{section.4}{Results}{}% 19
-\BOOKMARK [2][-]{subsection.4.1}{Performance measures}{section.4}% 20
-\BOOKMARK [2][-]{subsection.4.2}{Comparison to human player}{section.4}% 21
-\BOOKMARK [2][-]{subsection.4.3}{Comparison to the paper}{section.4}% 22
-\BOOKMARK [2][-]{subsection.4.4}{Something else}{section.4}% 23
-\BOOKMARK [2][-]{subsection.4.5}{Applications and future blah}{section.4}% 24
-\BOOKMARK [1][-]{section*.5}{Appendix A: Running instructions}{}% 25
-\BOOKMARK [1][-]{section*.5}{Bibliography}{}% 26
+\BOOKMARK [1][-]{section*.2}{Introduction}{}
+\BOOKMARK [1][-]{section.1}{A bird's-eye view of the system}{}
+\BOOKMARK [2][-]{subsection.1.1}{The task}{section.1}
+\BOOKMARK [2][-]{subsection.1.2}{Reinforcement learning}{section.1}
+\BOOKMARK [3][-]{subsubsection.1.2.1}{Exploration-exploitation}{subsection.1.2}
+\BOOKMARK [2][-]{subsection.1.3}{Neural network}{section.1}
+\BOOKMARK [2][-]{subsection.1.4}{Learning process}{section.1}
+\BOOKMARK [1][-]{section.2}{Components of the system}{}
+\BOOKMARK [2][-]{subsection.2.1}{Launching and communicating with ALE}{section.2}
+\BOOKMARK [2][-]{subsection.2.2}{Convolutional neural network}{section.2}
+\BOOKMARK [2][-]{subsection.2.3}{Q-learning}{section.2}
+\BOOKMARK [2][-]{subsection.2.4}{Something else}{section.2}
+\BOOKMARK [2][-]{subsection.2.5}{And once again how all those things are put together}{section.2}
+\BOOKMARK [1][-]{section.3}{Implementation details}{}
+\BOOKMARK [2][-]{subsection.3.1}{Agent}{section.3}
+\BOOKMARK [2][-]{subsection.3.2}{Memory}{section.3}
+\BOOKMARK [2][-]{subsection.3.3}{Preprocessing}{section.3}
+\BOOKMARK [2][-]{subsection.3.4}{Any other implementational stuff which is worth describing}{section.3}
+\BOOKMARK [1][-]{section.4}{Results}{}
+\BOOKMARK [2][-]{subsection.4.1}{Performance measures}{section.4}
+\BOOKMARK [2][-]{subsection.4.2}{Comparison to human player}{section.4}
+\BOOKMARK [2][-]{subsection.4.3}{Comparison to the paper}{section.4}
+\BOOKMARK [2][-]{subsection.4.4}{Something else}{section.4}
+\BOOKMARK [2][-]{subsection.4.5}{Applications and future blah}{section.4}
+\BOOKMARK [1][-]{section*.10}{Appendix A: Running instructions}{}
+\BOOKMARK [1][-]{section*.10}{Bibliography}{}
