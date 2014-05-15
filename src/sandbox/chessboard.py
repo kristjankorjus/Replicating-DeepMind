@@ -5,7 +5,7 @@ from PIL import Image
 
 
 
-def make_array():
+def make_chessboard():
     #result = np.zeros((84,84))
 
     row1 = np.tile(np.array([1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0]),(8,6))
@@ -27,6 +27,7 @@ def make_array():
 
 
 def show(result):
+    # Function doesn't work but isn't really necessary
     # Display array as image
     img = Image.new('RGB', (84,84), "black")  # create a new black image
     pixels = img.load()  # create the pixel map
@@ -34,9 +35,6 @@ def show(result):
     for i in range(84):
         for j in range(84):
             val = int(result[i][j])
-            pixels[i, j] = (val, val, val)
+            pixels[i, j] = (1, val, val)
 
     img.show()
-
-arr = make_array()
-show(arr)
