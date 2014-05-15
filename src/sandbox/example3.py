@@ -10,7 +10,7 @@ import theano.tensor as T
 import numpy as np
 from theano.tensor.nnet import conv
 # import theano.printing as tprint
-
+import chessboard
 
 def shared_dataset(data_xy):
     """
@@ -85,12 +85,9 @@ class OutputLayer:
 class ConvolutionalLayer(object):
     """Pool Layer of a convolutional network """
 
-    def __init__(self, rng, input, filter_shape, image_shape, stride=4):
+    def __init__(self, input_images, filter_shape, image_shape, stride=4):
         """
         Allocate a LeNetConvPoolLayer with shared variable internal parameters.
-
-        :type rng: numpy.random.RandomState
-        :param rng: a random number generator used to initialize weights
 
         :type input: theano.tensor.dtensor4
         :param input: symbolic image tensor, of shape image_shape
@@ -116,7 +113,7 @@ class ConvolutionalLayer(object):
 
         # number of nodes in our layer is nr_of_filters*( (image_size-filter_size)/stride))**2
         feature_map_size=(image_shape[2]-filter_shape[2])/stride
-        fan_out = (filter_shape[0] * feature_map_size * feature_map_size)
+        self.fan_out = (filter_shape[0] * feature_map_size * feature_map_size)
 
 
         # initialize weights with random weights
@@ -128,7 +125,7 @@ class ConvolutionalLayer(object):
         self.b = theano.shared(value=b_values, borrow=True)
 
         # convolve input feature maps with filters
-        convolution_output = conv.conv2d(input=input, filters=self.W,
+        convolution_output = conv.conv2d(input=input_images, filters=self.W,
                 filter_shape=filter_shape, image_shape=image_shape, subsample=(stride , stride))
 
         # add the bias term. Since the bias is a vector (1D array), we first
@@ -147,10 +144,16 @@ class MLP:
     """
     Class which implements the classification algorithm (neural network in our case)
     """
-    def __init__(self, input, n_in, n_hidden, n_out):
+    def __init__(self, input, input_shape, filter_shapes, strides, n_hidden, n_out):
+
+
+        #: Convolutional layer
+        self.conv_layer = ConvolutionalLayer(input, filter_shapes[0], input_shape, strides[0])
+
+        flattened_input=self.conv_layer.output.flatten(2)
 
         #: Hidden layer implements summation
-        self.hidden_layer = HiddenLayer(input, n_in, n_hidden)
+        self.hidden_layer = HiddenLayer(flattened_input, self.conv_layer.fan_out, n_hidden)
 
         #: Output layer implements summations and rectifier non-linearity
         self.output_layer = OutputLayer(self.hidden_layer.output, n_hidden, n_out)
@@ -161,27 +164,29 @@ class MLP:
         # L1 norm ; one regularization option is to enforce L1 norm to
         # be small
         self.L1 = abs(self.hidden_layer.W).sum() \
-                + abs(self.output_layer.W).sum()
+                + abs(self.output_layer.W).sum() \
+                + abs(self.conv_layer.W).sum()
 
         # square of L2 norm ; one regularization option is to enforce
         # square of L2 norm to be small
         self.L2_sqr = (self.hidden_layer.W ** 2).sum() \
-                    + (self.output_layer.W ** 2).sum()
+                    + (self.output_layer.W ** 2).sum() \
+                    + (self.conv_layer.W ** 2).sum()
 
-        self.params = self.hidden_layer.params + self.output_layer.params
+        self.params = self.hidden_layer.params + self.output_layer.params + self.conv_layer.params
 
 
 def main():
 
     #: Define data sets
-    #train_set = (np.array([[1, 1], [1, 0], [0, 1], [0, 0]]), np.array([1, 0, 0, 0]))
-    train_set = (np.array([[[0, 0], [0, 1], [1, 1], [1, 0]], [[0, 0], [0, 1], [1, 1], [1, 0]]]), np.array([[[0],[0], [1], [0]], [[0],[0], [1], [0]]]))
-    test_set = (np.array([[0, 0], [1, 0]]), np.array([0, 0]))
+    train_set = (np.array([chessboard.make_chessboard(8), chessboard.make_chessboard(2)]),
+                 np.array([1.0, 1.0]))
+
 
     # Transform them to theano.shared
     train_set_x, train_set_y = shared_dataset(train_set)
 
-    test_set_x, test_set_y = shared_dataset(test_set)
+    #test_set_x, test_set_y = shared_dataset(test_set)
 
     # This is how you can print weird theano stuff
     print train_set_x.eval()
@@ -192,9 +197,10 @@ def main():
     y = T.matrix('y')
     index = T.lscalar()
 
+    input_tensor=x.reshape((1,1,84,84))
 
     # Define the classification algorithm
-    classifier = MLP(input=x, n_in=2, n_hidden=1, n_out=1)
+    classifier = MLP(input=input_tensor, input_shape=[1, 1, 84, 84], filter_shapes=[[1, 1, 8, 8]], strides=[4], n_hidden=1, n_out=1)
 
     #define the cost function using l1 and l2 regularization terms:
     cost = classifier.output_layer.errors(y) \
@@ -204,34 +210,33 @@ def main():
     # print type(cost)
 
     # Calculate the derivatives by each existing parameter
-    gparams = []
-    for param in classifier.params:
-        gparam = T.grad(cost, param)
-        gparams.append(gparam)
+    #gparams = []
+    #for param in classifier.params:
+    #    gparam = T.grad(cost, param)
+    #    gparams.append(gparam)
 
     # Define how much we need to change the parameter values
-    learning_rate = 0.02
-    updates = []
-    for param, gparam in zip(classifier.params, gparams):
-        updates.append((param, param - learning_rate * gparam))
+    #learning_rate = 0.02
+    #updates = []
+    #for param, gparam in zip(classifier.params, gparams):
+    #    updates.append((param, param - learning_rate * gparam))
 
-    print updates
+    #print updates
 
     # Train model is a theano.function type object that performs updates on parameter values
-    train_model = theano.function(inputs=[index], outputs=cost,
-            updates=updates,
-            givens={
-                x: train_set_x[index],
-                y: train_set_y[index]})
+    #train_model = theano.function(inputs=[index], outputs=cost,
+    #        updates=updates,
+    #        givens={
+    #            x: train_set_x[index],
+    #            y: train_set_y[index]})
 
     # We construct an object of type theano.function, which we call test_model
     test_model = theano.function(
         inputs=[index],
-        outputs=[classifier.hidden_layer.input, classifier.output_layer.output, cost, classifier.hidden_layer.W,
-                 classifier.hidden_layer.b, classifier.output_layer.W, classifier.output_layer.b],
+        outputs=[classifier.hidden_layer.input],
         givens={
-            x: train_set_x[index],
-            y: train_set_y[index]})
+            x: train_set_x[index]
+            })
 
     n_train_points = train_set_x.get_value(borrow=True).shape[0]
     print "nr of training points is ", n_train_points
@@ -241,12 +246,12 @@ def main():
         print "we calculated something: ", result
 
     # lets train some iterations:
-    for iteration in range(1000):
-        cost = train_model(0)
+    #for iteration in range(1000):
+    #    cost = train_model(0)
 
-    for i in range(n_train_points):
-        result = test_model(i)
-        print "we calculated something: ", result
+    #for i in range(n_train_points):
+    #    result = test_model(i)
+    #    print "we calculated something: ", result
 
 if __name__ == '__main__':
     main()
