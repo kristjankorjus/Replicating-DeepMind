@@ -27,7 +27,7 @@ class ALE:
         os.system("mkfifo ale_fifo_in")
 
         #: launch ALE with appropriate commands in the background
-        command='./../libraries/ale/ale -game_controller fifo_named -run_length_encoding false -frame_skip '+str(self.skip_frames)+' -display_screen '+self.display_screen+" "+self.game_ROM+" &"
+        command='./../libraries/ale/ale -game_controller fifo_named -disable_colour_averaging -run_length_encoding false -frame_skip '+str(self.skip_frames)+' -display_screen '+self.display_screen+" "+self.game_ROM+" &"
         os.system(command)
 
         #: open communication with pipes

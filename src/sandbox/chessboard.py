@@ -9,8 +9,8 @@ def make_chessboard_any_size(image_size, n):
     """
     # n is length of small square
 
-    n_ones = n * [1]
-    n_zeros = n * [0]
+    n_ones = n * [1.0]
+    n_zeros = n * [0.0]
 
     repx = int(ceil(image_size/(2*n))) + 1
     #print(int(ceil(image_size/(2*n))))
