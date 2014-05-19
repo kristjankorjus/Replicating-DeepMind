@@ -43,5 +43,5 @@ def show(result):
     plt.imshow(result, interpolation='nearest')
     plt.show()
 
-arr = make_chessboard(8)
-show(arr)
+#arr = make_chessboard(8)
+#show(arr)
