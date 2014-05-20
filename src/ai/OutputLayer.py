@@ -39,4 +39,4 @@ class OutputLayer:
         if y.ndim != self.output.ndim:
             raise TypeError('y should have the same shape as self.output', ('y', y.type, 'output', self.output.type))
 
-        return np.abs(T.mean(self.output-y))
+        return T.mean(np.abs(self.output-y))
