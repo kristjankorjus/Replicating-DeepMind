@@ -61,7 +61,6 @@ class Main:
                 # Usually neural net chooses the best action
                 else:
                     print "chose by neural net"
-                    print np.shape([self.memory.get_last_state()]*32)
                     action = self.nnet.predict_best_action([self.memory.get_last_state()]*32)
                     print action
 
