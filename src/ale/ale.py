@@ -27,7 +27,7 @@ class ALE:
         os.system("mkfifo ale_fifo_in")
 
         #: launch ALE with appropriate commands in the background
-        command='./../libraries/ale/ale -game_controller fifo_named -disable_colour_averaging -run_length_encoding false -frame_skip '+str(self.skip_frames)+' -display_screen '+self.display_screen+" "+self.game_ROM+" &"
+        command='./../libraries/ale/ale -game_controller fifo_named -disable_colour_averaging true -run_length_encoding false -frame_skip '+str(self.skip_frames)+' -display_screen '+self.display_screen+" "+self.game_ROM+" &"
         os.system(command)
 
         #: open communication with pipes
@@ -72,10 +72,13 @@ class ALE:
     def store_step(self, action):
         self.memory.add(action, self.current_reward, self.preprocessor.process(self.next_image))
     
-    def move(self, action):
+    def move(self, action_index):
         """
         Sends action to ALE and reads responds
         """
+        #: Convert index to action
+        action = self.actions[action_index]
+
         #: Write and send to ALE stuff
         self.fout.write(str(action)+",0\n")
         self.fout.flush()

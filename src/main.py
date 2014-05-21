@@ -16,6 +16,7 @@ class Main:
     nnet = None
     ale = None
     minibatch_size = None
+    number_of_actions = None
 
     def __init__(self):
         self.memory = MemoryD(self.memory_size)
@@ -23,6 +24,7 @@ class Main:
         self.nnet = NeuralNet([self.minibatch_size, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]],
                               strides=[4, 2], n_hidden=256, n_out=4)
         self.ale = ALE(self.memory)
+        self.number_of_actions = 4
 
     def compute_epsilon(self, frames_played):
         """
@@ -52,7 +54,7 @@ class Main:
 
                 # Some times random action is chosen
                 if random.uniform(0, 1) < epsilon:
-                    action = random.choice(self.ale.actions)
+                    action = random.choice(range(self.number_of_actions))
 
                 # Usually neural net chooses the best action
                 else:
