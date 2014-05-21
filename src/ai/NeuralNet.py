@@ -108,7 +108,7 @@ class NeuralNet:
 
     def predict_best_action(self, state):
         predicted_values_for_actions = self.predict_rewards(state)[0]
-        return predicted_values_for_actions.index(max(predicted_values_for_actions))
+        return np.argmax(predicted_values_for_actions)
 
 
 

@@ -8,6 +8,7 @@ from ai.NeuralNet import NeuralNet
 from memory.memoryd import MemoryD
 from ale.ale import ALE
 import random
+import numpy as np
 
 
 class Main:
@@ -31,7 +32,7 @@ class Main:
         From the paper: "The behavior policy during training was epsilon-greedy
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         """
-        return max(1 - frames_played / self.memory_size, 0.1)
+        return max(0.9 - frames_played / self.memory_size, 0.1)
 
     def play_games(self, n):
         """
@@ -55,10 +56,14 @@ class Main:
                 # Some times random action is chosen
                 if random.uniform(0, 1) < epsilon:
                     action = random.choice(range(self.number_of_actions))
+                    print "chose randomly ", action
 
                 # Usually neural net chooses the best action
                 else:
-                    action = self.nnet.predict_best_action([self.memory.get_last_state]*32)
+                    print "chose by neural net"
+                    print np.shape([self.memory.get_last_state()]*32)
+                    action = self.nnet.predict_best_action([self.memory.get_last_state()]*32)
+                    print action
 
                 # Make the move
                 self.ale.move(action)
