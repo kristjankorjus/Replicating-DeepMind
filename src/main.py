@@ -8,41 +8,56 @@ from ai.NeuralNet import NeuralNet
 from memory.memoryd import MemoryD
 from ale.ale import ALE
 import random
-import numpy as np
 
 
 class Main:
-    memory_size = 100000   # how many transitions to keep in memory?
+    # How many transitions to keep in memory?
+    memory_size = 100000
+
+    # Memory itself
     memory = None
+
+    # Neural net
     nnet = None
+
+    # Communication with ALE
     ale = None
+
+    # Size of the mini-batch which will be sent to learning in Theano
     minibatch_size = None
+
+    # Number of possible actions in a given game
     number_of_actions = None
 
     def __init__(self):
         self.memory = MemoryD(self.memory_size)
-        self.minibatch_size = 32
+        self.minibatch_size = 32  # Given in the paper
+        self.number_of_actions = 4  # Game "Breakout" has 4 possible actions
+
+        # Properties of the neural net which come from the paper
         self.nnet = NeuralNet([self.minibatch_size, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]],
-                              strides=[4, 2], n_hidden=256, n_out=4)
+                              strides=[4, 2], n_hidden=256, n_out=self.number_of_actions)
         self.ale = ALE(self.memory)
-        self.number_of_actions = 4
 
     def compute_epsilon(self, frames_played):
         """
         From the paper: "The behavior policy during training was epsilon-greedy
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
+        @param frames_played: How far are we with our learning?
         """
         return max(0.9 - frames_played / self.memory_size, 0.1)
 
     def play_games(self, n):
         """
         Main cycle: plays many games and many frames in each game. Also learning is performed.
+        @param n: total number of games allowed to play
         """
 
         games_to_play = n
         games_played = 0
         frames_played = 0
 
+        # Play games until maximum number is reached
         while games_played < games_to_play:
             # Start a new game
             self.ale.new_game()
