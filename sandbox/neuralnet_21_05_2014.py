@@ -13,7 +13,7 @@ from HiddenLayer import *
 from OutputLayer import *
 import chessboard
 
-theano.config.openmp = True
+theano.config.openmp=True
 
 class NeuralNet:
 
@@ -25,7 +25,7 @@ class NeuralNet:
         self.layer_hidden_conv1 = ConvolutionalLayer(x, filter_shapes[0], input_shape, strides[0])
 
 
-        second_conv_input_shape = [input_shape[0], filter_shapes[0][0], self.layer_hidden_conv1.feature_map_size, self.layer_hidden_conv1.feature_map_size]
+        second_conv_input_shape=[input_shape[0], filter_shapes[0][0], self.layer_hidden_conv1.feature_map_size, self.layer_hidden_conv1.feature_map_size]
         self.layer_hidden_conv2 = ConvolutionalLayer(self.layer_hidden_conv1.output, filter_shapes[1],
                                                      image_shape=second_conv_input_shape, stride=2)
 
@@ -72,6 +72,14 @@ class NeuralNet:
                 x: temp1,
                 y: temp2})
 
+        #self.shared_q = theano.shared(np.zeros((32,4)))
+        #self.shared_s = theano.shared(np.zeros((32,4,84,84)))
+        #self.train_model_shared = theano.function(inputs=[], outputs=[cost],
+        #    updates=updates,
+        #    givens={
+        #        x: self.shared_s,
+        #        y: self.shared_q
+        #    })
 
 
         self.predict_rewards = theano.function(
@@ -105,12 +113,19 @@ class NeuralNet:
             states.append(transition['prestate'])
             expected_Qs.append(rewards)
 
+        #self.shared_s = theano.shared(states)
+        #self.shared_q = theano.shared(expected_Qs)
+        #print "expected", expected_Qs[0]
+        #print "expected", self.shared_q.eval()[0]
+        #print self.predict_rewards_and_cost(self.shared_s.eval(),self.shared_q.eval())[0][0]
+
+        #return self.train_model_shared()
         self.train_model(states, expected_Qs)
 
 
 
-"""
-deepMind = NeuralNet([32, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]], strides=[4, 2], n_hidden=256, n_out=4)
+
+deepMind=NeuralNet([32, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]], strides=[4, 2], n_hidden=256, n_out=4)
 
 #generateRandomData
 Xs = []
@@ -127,15 +142,14 @@ print out
 print remaining_error
 
 #minibatch for training does not contain "y"
-mb = [{'prestate': [chessboard.make_chessboard(8)]*4, 'action':0, 'reward':1, 'poststate':[chessboard.make_chessboard(8)]*4}]*32
+mb=[{'prestate' : [chessboard.make_chessboard(8)]*4, 'action':0, 'reward':1, 'poststate':[chessboard.make_chessboard(8)]*4}]*32
 
 for i in range(100):
     deepMind.train(mb)
     q,c= deepMind.predict_rewards_and_cost(Xs, Ys)
     print q[0], c
-
+    #deepMind.train_model(Xs, Ys)
 
 out, remaining_error = deepMind.predict_rewards_and_cost(Xs, Ys)
 print out[0]
 print remaining_error
-"""
