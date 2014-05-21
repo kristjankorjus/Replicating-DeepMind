@@ -4,6 +4,7 @@ import os
 import numpy as np
 from preprocessor import Preprocessor
 
+
 class ALE:
     actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
     current_reward = 0
@@ -21,13 +22,14 @@ class ALE:
         self.display_screen = display_screen
         self.skip_frames = skip_frames
         self.memory = memory
-        
+        self.game_ROM = game_ROM
+
         #: create FIFO pipes
         os.system("mkfifo ale_fifo_out")
         os.system("mkfifo ale_fifo_in")
 
         #: launch ALE with appropriate commands in the background
-        command='./../libraries/ale/ale -game_controller fifo_named -disable_colour_averaging true -run_length_encoding false -frame_skip '+str(self.skip_frames)+' -display_screen '+self.display_screen+" "+self.game_ROM+" &"
+        command='./../libraries/ale/ale -max_num_episodes 0 -game_controller fifo_named -disable_colour_averaging true -run_length_encoding false -frame_skip '+str(self.skip_frames)+' -display_screen '+self.display_screen+" "+self.game_ROM+" &"
         os.system(command)
 
         #: open communication with pipes
