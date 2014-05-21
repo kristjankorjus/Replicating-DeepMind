@@ -11,7 +11,6 @@ import theano
 from ConvolutionalLayer import *
 from HiddenLayer import *
 from OutputLayer import *
-import chessboard
 
 theano.config.openmp = True
 
@@ -106,6 +105,11 @@ class NeuralNet:
             expected_Qs.append(rewards)
 
         self.train_model(states, expected_Qs)
+
+    def predict_best_action(self, state):
+        predicted_values_for_actions = self.predict_rewards(state)[0]
+        return predicted_values_for_actions.index(max(predicted_values_for_actions))
+
 
 
 

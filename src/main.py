@@ -4,20 +4,24 @@ This is the main class where all thing are put together
 
 """
 
-from ai.neuralnet import NeuralNet
+from ai.NeuralNet import NeuralNet
 from memory.memoryd import MemoryD
 from ale.ale import ALE
 import random
+
 
 class Main:
     memory_size = 100000   # how many transitions to keep in memory?
     memory = None
     nnet = None
     ale = None
+    minibatch_size = None
 
     def __init__(self):
         self.memory = MemoryD(self.memory_size)
-        self.nnet = NeuralNet()
+        self.minibatch_size = 32
+        self.nnet = NeuralNet([self.minibatch_size, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]],
+                              strides=[4, 2], n_hidden=256, n_out=4)
         self.ale = ALE(self.memory)
 
     def compute_epsilon(self, frames_played):
@@ -52,7 +56,7 @@ class Main:
 
                 # Usually neural net chooses the best action
                 else:
-                    action = self.nnet.get_action(self.memory.get_last_state)
+                    action = self.nnet.predict_best_action([self.memory.get_last_state]*32)
 
                 # Make the move
                 self.ale.move(action)
@@ -61,7 +65,7 @@ class Main:
                 self.ale.store_step(action)
 
                 # Start a training session
-                self.nnet.train()
+                self.nnet.train(self.memory.get_minibatch(self.minibatch_size))
 
             # After "game over" increase the number of games played
             games_played += 1
