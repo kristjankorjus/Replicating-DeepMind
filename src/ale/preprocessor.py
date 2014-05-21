@@ -1,4 +1,8 @@
+"""
 
+Preprocessor takes images from ALE and turns them into cropped, downscaled arrays of grayscale values.
+
+"""
 
 
 
@@ -11,9 +15,16 @@ class Preprocessor:
     grayscale_array = None
 
     def __init__(self):
+        """
+        Initialise preprocessor
+        """
         self.grayscale_array = self.get_grayscale_array()
 
     def process(self, image_string):
+        """
+        Returns the cropped, downscaled, grayscale array representation of the image.
+        @param image_string: a string that ALE outputs, corresponding to a 160x210 color image
+        """
         height = self.ORIGINAL_HEIGHT
         width = self.ORIGINAL_WIDTH
         arr = self.grayscale_array
@@ -47,6 +58,9 @@ class Preprocessor:
 
 
     def get_grayscale_array(self):
+        """
+        Returns the (numpy) array that is used for mapping NTSC colors to grayscale values
+        """
         import numpy as np
         myArray = np.array(
             [[0.000000000000000000e+00,6.256000000000000227e+01,5.192000000000000171e+01,4.475999999999999801e+01,2.855999999999999872e+01,3.164000000000000057e+01,2.351999999999999957e+01,1.344000000000000128e+01,9.520000000000001350e+00,2.571999999999999886e+01,3.767999999999999972e+01,4.567999999999999261e+01,4.259999999999999432e+01,4.396000000000000085e+01,4.332000000000000028e+01,4.267999999999999972e+01],
