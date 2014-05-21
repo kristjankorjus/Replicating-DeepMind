@@ -30,8 +30,8 @@ class ConvolutionalLayer(object):
         self.fan_in = np.prod(filter_shape[1:])
 
         # number of nodes in our layer is nr_of_filters*( (image_size-filter_size)/stride))**2
-        feature_map_size=1+(image_shape[2]-filter_shape[2])/stride
-        self.fan_out = (filter_shape[0] * feature_map_size * feature_map_size)
+        self.feature_map_size=1+(image_shape[2]-filter_shape[2])/stride
+        self.fan_out = (filter_shape[0] * self.feature_map_size * self.feature_map_size)
 
 
         #we need to define the interval at which we initialize the weights. We use formula from example
@@ -55,8 +55,8 @@ class ConvolutionalLayer(object):
         # width & height
         self.threshold = 0
         activation = convolution_output + self.b.dimshuffle('x', 0, 'x', 'x')
-        #above_threshold = activation > self.threshold
-        #self.output = above_threshold * (activation - self.threshold)
-        self.output=activation
+        above_threshold = activation > self.threshold
+        self.output = above_threshold * (activation - self.threshold)
+        #self.output = activation
         # store parameters of this layer
         self.params = [self.W, self.b]

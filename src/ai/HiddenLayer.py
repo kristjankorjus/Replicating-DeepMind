@@ -19,8 +19,11 @@ class HiddenLayer:
         b_values = np.zeros((n_nodes,), dtype=theano.config.floatX)
         self.b = theano.shared(value=b_values, name='b', borrow=True)
 
-        #: Output is just the weighted sum of activations
-        self.output = T.dot(input, self.W) + self.b
+        self.threshold=0
+        #: Output is rectified
+        dot_product = T.dot(input, self.W) + self.b
+        above_threshold = dot_product>self.threshold
+        self.output = above_threshold * (dot_product-self.threshold)
 
         #all the variables that can change during learning
         self.params = [self.W, self.b]

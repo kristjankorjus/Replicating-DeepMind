@@ -19,11 +19,9 @@ class OutputLayer:
         b_values = np.zeros((n_nodes,), dtype=theano.config.floatX)
         self.b = theano.shared(value=b_values, name='b', borrow=True)
 
-        #output using linear rectifier
-        self.threshold = 0
+        #output layer does not use linear rectifier
         lin_output = T.dot(input_from_previous_layer, self.W) + self.b
-        above_threshold = lin_output > self.threshold
-        self.output = above_threshold * (lin_output - self.threshold)
+        self.output = lin_output
 
         #all the variables that can change during learning
         self.params = [self.W, self.b]
