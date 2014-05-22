@@ -8,7 +8,7 @@ from ConvolutionalLayer import *
 from HiddenLayer import *
 from OutputLayer import *
 
-theano.config.openmp = True
+theano.config.openmp = False  # they say that using openmp becomes efficient only with "very large scale convolution"
 
 
 class NeuralNet:
@@ -141,11 +141,10 @@ class NeuralNet:
         #: knowing what expected_qs looks like, we can train the model
         self.train_model(initial_states, expected_qs)
 
-
     def predict_best_action(self, state):
         """
         Predict_best_action returns the action with the highest Q-value
         @param state: 4D array, input (game state) for which we want to know the best action
         """
-        predicted_values_for_actions = self.predict_rewards(state)[0]
-        return np.argmax(predicted_values_for_actions)
+        predicted_values_for_actions = self.predict_rewards(state)[0][0]
+        return  np.argmax(predicted_values_for_actions)
