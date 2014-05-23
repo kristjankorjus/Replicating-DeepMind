@@ -28,6 +28,7 @@ class Preprocessor:
         height = self.ORIGINAL_HEIGHT
         width = self.ORIGINAL_WIDTH
         arr = self.grayscale_array
+        desired_image_size = 84     # the size of the new image will be desired_image_size x desired_image_size
 
         img = Image.new('RGB', (width, height), "black")  # create a new black image
         pixels = img.load()                               # get the pixel map
@@ -47,7 +48,7 @@ class Preprocessor:
         # Crop and downscale image
         roi = (0, 33, 160, 193)  # region of interest is lines 33 to 193
         img = img.crop(roi)
-        new_size = 84, 84
+        new_size = desired_image_size, desired_image_size
         img.thumbnail(new_size)
 
         # Get pixel data again
