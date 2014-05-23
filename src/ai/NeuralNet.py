@@ -9,7 +9,7 @@ from HiddenLayer import *
 from OutputLayer import *
 
 theano.config.openmp = False  # they say that using openmp becomes efficient only with "very large scale convolution"
-
+theano.config.floatX = 'float32'
 
 class NeuralNet:
 
@@ -27,8 +27,8 @@ class NeuralNet:
         '''
 
         #create theano variables corresponding to input_batch (x) and output of the network (y)
-        x = T.dtensor4('x')
-        y = T.dmatrix('y')
+        x = T.ftensor4('x')
+        y = T.fmatrix('y')
 
         #first hidden layer is convolutional:
         self.layer_hidden_conv1 = ConvolutionalLayer(x, filter_shapes[0], input_shape, strides[0])
@@ -77,14 +77,14 @@ class NeuralNet:
         grads = T.grad(cost, self.params)
 
         #: Define how much we need to change the parameter values
-        learning_rate = 0.01
+        learning_rate = 0.0001
         updates = []
         for param_i, gparam_i in zip(self.params, grads):
             updates.append((param_i, param_i - learning_rate * gparam_i))
 
         #: we need another set of theano variables (other than x and y) to use in train and predict functions
-        temp_x = T.dtensor4('temp1')
-        temp_y = T.dmatrix('temp2')
+        temp_x = T.ftensor4('temp_x')
+        temp_y = T.fmatrix('temp_y')
 
         #: define the training operation as applying the updates calculated given temp_x and temp_y
         self.train_model = theano.function(inputs=[temp_x, temp_y],
@@ -101,6 +101,7 @@ class NeuralNet:
                 x: temp_x
             })
 
+
         self.predict_rewards_and_cost = theano.function(
             inputs=[temp_x, temp_y],
             outputs=[self.layer_output.output, cost],
@@ -109,7 +110,7 @@ class NeuralNet:
                 y: temp_y
             })
 
-
+    @profile
     def train(self, minibatch):
         """
         Train function that transforms (state,action,reward,state) into (input, expected_output) for neural net
@@ -118,29 +119,16 @@ class NeuralNet:
         one transition (prestate,action,reward,poststate)
         """
 
-        #: array of size (batch_size,4), that will be filled with our best estimation on what Q-values should be like.
-        #  Corresponds to the "expected_output" or "y" of the neural net
-        expected_qs = []
-
-        initial_states = [element['prestate'] for element in minibatch]
-        states2 = [element['poststate'] for element in minibatch]
-
-        #: our network's current estimation of Q-s for each possible action
-        current_predicted_rewards = self.predict_rewards(initial_states)[0]
-
-        #: the Q-s of the state we actually went to (by choosing an action), we actually only want the maximum of them
-        predicted_future_rewards = self.predict_rewards(states2)[0]
-
         #: we have a new, better estimation for the Q-val of the action we chose, it is the sum of the reward
         #  received on transition and the maximum of future rewards. Q-s for other actions remain the same.
         for i, transition in enumerate(minibatch):
-            rewards = current_predicted_rewards[i]
-            rewards[transition['action']] = transition['reward'] + self.gamma * np.max(predicted_future_rewards[i])
-            expected_qs.append(rewards)
+            estimated_Q = self.predict_rewards([transition['prestate']])[0][0]
+            estimated_Q[transition['action']] = transition['reward'] + self.gamma \
+                                                * np.max(self.predict_rewards([transition['prestate']]))
+            #: knowing what estimated_Q looks like, we can train the model
+            self.train_model([transition['prestate']], [estimated_Q])
 
-        #: knowing what expected_qs looks like, we can train the model
-        self.train_model(initial_states, expected_qs)
-
+    @profile
     def predict_best_action(self, state):
         """
         Predict_best_action returns the action with the highest Q-value

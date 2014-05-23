@@ -35,7 +35,7 @@ class Main:
         self.number_of_actions = 4  # Game "Breakout" has 4 possible actions
 
         # Properties of the neural net which come from the paper
-        self.nnet = NeuralNet([self.minibatch_size, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]],
+        self.nnet = NeuralNet([1, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]],
                               strides=[4, 2], n_hidden=256, n_out=self.number_of_actions)
         self.ale = ALE(self.memory)
 
@@ -46,6 +46,7 @@ class Main:
         @param frames_played: How far are we with our learning?
         """
         return max(0.9 - frames_played / self.memory_size, 0.1)
+
 
     def play_games(self, n):
         """
@@ -76,7 +77,7 @@ class Main:
                 # Usually neural net chooses the best action
                 else:
                     print "chose by neural net"
-                    action = self.nnet.predict_best_action([self.memory.get_last_state()]*32)
+                    action = self.nnet.predict_best_action([self.memory.get_last_state()])
                     print action
 
                 # Make the move
@@ -86,6 +87,7 @@ class Main:
                 self.ale.store_step(action)
 
                 # Start a training session
+
                 self.nnet.train(self.memory.get_minibatch(self.minibatch_size))
 
             # After "game over" increase the number of games played
@@ -97,4 +99,4 @@ class Main:
 
 if __name__ == '__main__':
     m = Main()
-    m.play_games(10)
+    m.play_games(1)
