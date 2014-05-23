@@ -1,5 +1,7 @@
 # Make sure Python searches the src directory when importing modules
-import os, sys
+import os, sys, pylab
+import matplotlib.pyplot as plt
+#import matplotlib.colors.Colormap as col
 sys.path.insert(0, os.path.abspath('..\src'))
 
 
@@ -20,5 +22,7 @@ f.close()
 # Preprocess image
 img = pre.process(pixs)
 
-# Print the resulting array
-print(img)
+# Show the resulting array
+# the color mapping is not correct?
+plt.imshow(img, cmap=pylab.get_cmap("Purples"), interpolation='nearest')
+plt.show()

@@ -9,10 +9,9 @@ import numpy as np
 
 
 class Preprocessor:
-    ORIGINAL_HEIGHT = 210
-    ORIGINAL_WIDTH = 160
 
     grayscale_array = None
+    desired_image_size = 84         # the size of the new image will be desired_image_size x desired_image_size
 
     def __init__(self):
         """
@@ -25,37 +24,25 @@ class Preprocessor:
         Returns the cropped, downscaled, grayscale array representation of the image.
         @param image_string: a string that ALE outputs, corresponding to a 160x210 color image
         """
-        height = self.ORIGINAL_HEIGHT
-        width = self.ORIGINAL_WIDTH
         arr = self.grayscale_array
-        desired_image_size = 84     # the size of the new image will be desired_image_size x desired_image_size
 
-        img = Image.new('RGB', (width, height), "black")  # create a new black image
-        pixels = img.load()                               # get the pixel map
+        # Crop irrelevant lines from beginning and end
+        cropped = image_string[160*33*2:160*193*2]
 
-        # Fill the PIL image object with the correct pixel values
-        for i in range(len(image_string)/2):
-            num_rows = i % width
-            num_cols = i / width
+        # Split cropped image string into a list of hex codes
+        hexs = [cropped[i*2:i*2+2] for i in range(len(cropped)/2)]
 
-            hex1 = int(image_string[i*2], 16)
+        # Map each element of the list to the corresponding gray value
+        grays = np.asarray(map(lambda hex_val: arr[int(hex_val[1], 16) ,int(hex_val[0], 16)], hexs))
 
-            # Division by 2 because: http://en.wikipedia.org/wiki/List_of_video_game_console_palettes
-            hex2 = int(image_string[i*2+1], 16)/2
-            gray_val = int(arr[hex2, hex1])
-            pixels[num_rows, num_cols] = (gray_val, gray_val, gray_val)
-
-        # Crop and downscale image
-        roi = (0, 33, 160, 193)  # region of interest is lines 33 to 193
-        img = img.crop(roi)
-        new_size = desired_image_size, desired_image_size
+        # Turn the array into an image object and downscale
+        img = Image.fromarray(grays.reshape((160, 160)))
+        new_size = self.desired_image_size, self.desired_image_size
         img.thumbnail(new_size)
 
         # Get pixel data again
         raw_pixels = np.asarray(img, dtype=np.uint8)
-
-        # Return only R value from RGB representation because R=G=B here.
-        return raw_pixels[:, :, 0]
+        return raw_pixels
 
     def get_grayscale_array(self):
         """
