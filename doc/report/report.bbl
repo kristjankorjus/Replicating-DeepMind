@@ -35,6 +35,11 @@ Geoffrey~E Hinton.
 \newblock Learning multiple layers of representation.
 \newblock {\em Trends in cognitive sciences}, 11(10):428--434, 2007.
 
+\bibitem[LB95]{lecun1995convolutional}
+Yann LeCun and Yoshua Bengio.
+\newblock Convolutional networks for images, speech, and time series.
+\newblock {\em The handbook of brain theory and neural networks}, 3361, 1995.
+
 \bibitem[MKS{\etalchar{+}}13]{mnih2013playing}
 Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis
   Antonoglou, Daan Wierstra, and Martin Riedmiller.
@@ -51,5 +56,10 @@ T~Tieleman and G~Hinton.
 \newblock Lecture 6.5-rmsprop: Divide the gradient by a running average of its
   recent magnitude.
 \newblock {\em COURSERA: Neural Networks for Machine Learning}, 4, 2012.
+
+\bibitem[WD92]{watkins1992q}
+Christopher~JCH Watkins and Peter Dayan.
+\newblock Q-learning.
+\newblock {\em Machine learning}, 8(3-4):279--292, 1992.
 
 \end{thebibliography}
