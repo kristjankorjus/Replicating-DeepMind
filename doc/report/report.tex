@@ -108,10 +108,10 @@ The system receives a picture of a game screen (an example is shown in Figure \r
 \end{figure}
 
 \subsection{Reinforcement learning}
-In a reinforcement learning setting, an agent takes actions in an environment with the goal of maximising a cumulative reward. Ee tried to create a software agent that plays ATARI games in an emulator (the environment) and maximises its performance in the game, measured by its score in the games.
+In a reinforcement learning setting, an agent takes actions in an environment with the goal of maximising a cumulative reward. We tried to create a software agent that plays ATARI games in an emulator (the environment) and maximises its performance in the game, measured by its score in the games.
 
 \subsubsection{Exploration-exploitation}
-When the algorithm chooses between possible actions, it picks a "learned" action with probability $1-\epsilon$ and a random action with probability $\epsilon$. The value of $\epsilon$ is gradually decreased as the algorithm learns to play better.
+When the algorithm chooses between possible actions, it picks a ``learned" action with probability $1-\epsilon$ and a random action with probability $\epsilon$. The value of $\epsilon$ is gradually decreased as the algorithm learns to play better.
 
 It is necessary to sometimes pick a random action to not get stuck in local reward maxima. At first, the value of $\epsilon$ is small and the agent takes random actions most of the time. This relatively high emphasis on exploration is necessary for the agent to collect information about the environment. When $\epsilon$ starts to decrease, the agent starts to apply its learned behaviour more and more, i.e. moving towards exploitation.
 
@@ -127,18 +127,30 @@ Under the fancy word ``neural network" hides a quite simple idea: bunch of \emph
 
 We, as the builders of the system, usually know what we want it do: that is for each data sample we know what the final output should look like. Now the ``smart" neural network is the one able to produce the output we expect, the ``naive" network is the one which is not. The only thing that differs in those two are the \emph{weights} on the connections between the nodes. By changing them in accordance with our final goal the network goes from being ``naive" to being ``smart". This process in general in known as \emph{learning}.
 
-The system learns, i.e. improves the accuracy of its predictions, by updating the weights of connections between nodes in the neural network.
+To explain the concept of learning to the machine we introduce the notion of \emph{cost function} (or \emph{loss function}) which we will denote by $L$. Given the parameters of the network this function goes over the data samples, computes the outputs, compares these outputs with the expected ones and calculates how big is the error the system makes. The learning process can be represented as the process of \emph{minimizing} the cost function.
 
-[needs expansion]
+The obvious way to minimize a function is to try out all possible inputs to find the minimal output. Unfortunately the number of possible input is unfeasibly large. How to do it is a big question not only for our system. The whole brach on computer science called \emph{optimization} is dealing with this issue. One of the most popular technique used in this area is called \emph{gradient descent}.
 
-gradient descent blabla
+The idea of gradient descent is rather trivial: at each \emph{iteration} of the learning algorithm it makes a small step in the ``direction" which makes the value of the loss function smaller. Thus by making enough steps the algorithm will reach an \emph{optimum}: a place from where step in any direction will only increase the value of the loss function. Once this optimum is found we say that the learning has finished and the system is now as smart as it can be. It might happen that the optimum we found is not the best one (\emph{local optimum}), and there are bunch of techniques (for example \emph{Monte Carlo} methods) to find the \emph{global optimum}, but we will not dwell into this right now. 
+
+Gradient descent uses the \emph{gradient} (multidimensional derivative) as it's core:
+\begin{enumerate}
+	\item Let the current configuration of the system be $\mathbf{w_0}$
+	\item Compute the derivative (gradient) of the loss function at this point $L(\mathbf{w_0})$
+	\item Look at the derivative with respect to each element $(w_1, \ldots, w_n) = \mathbf{w_0}$ and:
+	\begin{enumerate}
+		\item If the derivative is 0 then we should not touch this parameter of our system
+		\item Otherwise move one step in the direction opposite to the derivative (positive slope -- decrease the parameter, negative slope -- increase the parameter)
+	\end{enumerate}
+	\item Repeat starting from the step 2. until the derivatives with respect to all parameters of the system are zeros (or close to zeros)
+\end{enumerate}
+Once this process is complete we believe that our system has reached the optimal state: it's parameters are configures in such way that it will give optimal performance on the dataset we have. In our system we will use variation of the idea of gradient descent called RMSProp, you will read about it later.
 
 
 
 %
 % Components
 %
-\pagebreak
 \section{Components of the system}
 here goes the detailed description of everything (aka the hardest part)
 
@@ -172,7 +184,7 @@ With these two convolutional layers we have reduced the number of nodes from 4x8
 \subsection{Q-learning}
 ...
 
-\subsection{Something else}
+\subsection{RMSProp}
 ...
 
 
@@ -213,10 +225,10 @@ The colors from ATARI's NTSC palette are converted to RGB using a conversion tab
 \end{figure}
 
 \subsection{Neural network}
-
+Theano
 
 \subsection{Any other implementational stuff which is worth describing}
-...
+Class diagram?
 
 
 %

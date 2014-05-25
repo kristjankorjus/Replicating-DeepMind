@@ -9,7 +9,7 @@
 \BOOKMARK [2][-]{subsection.2.1}{Launching and communicating with ALE}{section.2}% 9
 \BOOKMARK [2][-]{subsection.2.2}{Convolutional neural network}{section.2}% 10
 \BOOKMARK [2][-]{subsection.2.3}{Q-learning}{section.2}% 11
-\BOOKMARK [2][-]{subsection.2.4}{Something else}{section.2}% 12
+\BOOKMARK [2][-]{subsection.2.4}{RMSProp}{section.2}% 12
 \BOOKMARK [2][-]{subsection.2.5}{And once again how all those things are put together}{section.2}% 13
 \BOOKMARK [1][-]{section.3}{Implementation details}{}% 14
 \BOOKMARK [2][-]{subsection.3.1}{Agent}{section.3}% 15
