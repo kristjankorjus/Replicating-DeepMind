@@ -1,34 +1,33 @@
-\contentsline {section}{Introduction}{4}{section*.2}
-\contentsline {section}{\numberline {1}Overview of the system}{5}{section.1}
-\contentsline {subsection}{\numberline {1.1}The task}{5}{subsection.1.1}
-\contentsline {subsection}{\numberline {1.2}Reinforcement learning}{5}{subsection.1.2}
-\contentsline {subsubsection}{\numberline {1.2.1}Exploration-exploitation}{5}{subsubsection.1.2.1}
-\contentsline {subsection}{\numberline {1.3}Neural network}{6}{subsection.1.3}
-\contentsline {subsection}{\numberline {1.4}Learning process}{6}{subsection.1.4}
+\contentsline {section}{Introduction}{3}{section*.2}
+\contentsline {section}{\numberline {1}Overview of the system}{4}{section.1}
+\contentsline {subsection}{\numberline {1.1}The task}{4}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Reinforcement learning}{4}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Exploration-exploitation}{4}{subsubsection.1.2.1}
+\contentsline {subsection}{\numberline {1.3}Neural network}{5}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.4}Learning process}{5}{subsection.1.4}
 \contentsline {section}{\numberline {2}Components of the system}{7}{section.2}
 \contentsline {subsection}{\numberline {2.1}Launching and communicating with ALE}{7}{subsection.2.1}
 \contentsline {paragraph}{}{7}{section*.3}
 \contentsline {paragraph}{}{7}{section*.4}
-\contentsline {subsection}{\numberline {2.2}Convolutional neural network}{8}{subsection.2.2}
-\contentsline {paragraph}{}{8}{section*.5}
+\contentsline {subsection}{\numberline {2.2}Convolutional neural network}{7}{subsection.2.2}
+\contentsline {paragraph}{}{7}{section*.5}
 \contentsline {paragraph}{}{8}{section*.6}
 \contentsline {paragraph}{}{8}{section*.7}
 \contentsline {paragraph}{}{8}{section*.8}
 \contentsline {paragraph}{}{8}{section*.9}
-\contentsline {subsection}{\numberline {2.3}Q-learning}{9}{subsection.2.3}
-\contentsline {subsection}{\numberline {2.4}RMSProp}{9}{subsection.2.4}
-\contentsline {subsection}{\numberline {2.5}And once again how all those things are put together}{9}{subsection.2.5}
-\contentsline {section}{\numberline {3}Implementation details}{10}{section.3}
-\contentsline {subsection}{\numberline {3.1}Agent}{10}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Memory}{10}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Preprocessing}{10}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Neural network}{10}{subsection.3.4}
-\contentsline {subsection}{\numberline {3.5}Any other implementational stuff which is worth describing}{10}{subsection.3.5}
-\contentsline {section}{\numberline {4}Results}{11}{section.4}
-\contentsline {subsection}{\numberline {4.1}Performance measures}{11}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Comparison to human player}{11}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Comparison to the original paper}{11}{subsection.4.3}
-\contentsline {subsection}{\numberline {4.4}Something else}{11}{subsection.4.4}
-\contentsline {subsection}{\numberline {4.5}Applications and future blah}{11}{subsection.4.5}
-\contentsline {section}{Appendix A: Running instructions}{12}{section*.10}
-\contentsline {section}{Bibliography}{13}{section*.10}
+\contentsline {subsection}{\numberline {2.3}Q-learning}{8}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}RMSProp}{8}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}And once again how all those things are put together}{8}{subsection.2.5}
+\contentsline {section}{\numberline {3}Implementation details}{9}{section.3}
+\contentsline {subsection}{\numberline {3.1}Agent}{9}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Memory}{9}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Preprocessing}{9}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Neural network}{9}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Any other implementational stuff which is worth describing}{9}{subsection.3.5}
+\contentsline {section}{\numberline {4}Results}{10}{section.4}
+\contentsline {subsection}{\numberline {4.1}Performance measures}{10}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Comparison to human player}{10}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Comparison to the original paper}{10}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Applications and future usage}{10}{subsection.4.4}
+\contentsline {section}{Appendix A: Running instructions}{11}{section*.10}
+\contentsline {section}{Bibliography}{12}{section*.10}
