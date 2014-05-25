@@ -123,6 +123,7 @@ The system uses a neural network to assign an expected reward value to each poss
 The output layer has one node for each possible action and the activation of those nodes indicates the expected reward from each of the possible actions - here, the action with the highest expected reward is selected for execution.
 
 \subsection{Learning process}
+\label{sec:learningprocess}
 Under the fancy word ``neural network" hides a quite simple idea: bunch of \emph{nodes} (neurons), each of them having some \emph{input} to perform a computation on and an \emph{output} where the result of the computation will be sent to, are connected to each other. Each connection has a \emph{weight}, which regulates how much one neuron can affect another. The very first layer of the network is usually called the \emph{input layer}. This is the place where we inject a data sample. Next to the input layer the network has several trickily connected \emph{hidden layers}. And the last layer is an \emph{output layer}, it gives us the final piece of information we wanted to know about the data sample we fed into the network. The resulting structure can be very complex, but the building blocks are always the same: neurons and connections between them.
 
 We, as the builders of the system, usually know what we want it do: that is for each data sample we know what the final output should look like. Now the ``smart" neural network is the one able to produce the output we expect, the ``naive" network is the one which is not. The only thing that differs in those two are the \emph{weights} on the connections between the nodes. By changing them in accordance with our final goal the network goes from being ``naive" to being ``smart". This process in general in known as \emph{learning}.
@@ -185,12 +186,21 @@ With these two convolutional layers we have reduced the number of nodes from 4x8
 \subsection{Q-learning}
 ...
 
-\subsection{RMSProp}
-...
+\subsection{Root Mean Squares of gradients (RMSProp)}
 
+In Section \ref{sec:learningprocess} we have seen the logic of gradient descent update procedure. There are, however, problems with this approach. One of them is that once you have established and update vector $\mathbf{u}$ you might notice that for some components $u_i = \frac{\partial L(\mathbf{w})}{\partial w_i}$ it proposes huge changes and tiny changes for the others. It might be not very reasonable to use the same learning $\mu$ rate for all components. The idea of RMSProp is to come up with a separate learning rate $\mu_i$ for each of the components $u_i$.
 
-\subsection{And once again how all those things are put together}
+If you can use all of your data to estimate the direction of the gradient, then you can cope with this problem by just using sign of the gradient $sign(\frac{\partial L(\mathbf{w})}{\partial w_i})$. This will ensure that all components of the gradient are treated equally. This approach is called \emph{rprop}. However we do not have the luxury of using all the data points in our loss function $L$: it would take too much time. This is where the idea of \emph{stochastic gradient descent} comes into play.
 
+\subsubsection{Stochastic gradient descent}
+As you know, if you have a set of differentiable functions, then the sum of these functions is also differentiable and the derivative of this function is equal to the sum of the derivatives of these functions:
+$$\nabla f(\mathbf{w}, \mathbf{x}) = \displaystyle\sum\nabla g(\mathbf{w}, \mathbf{x_k})$$
+where $\mathbf{x}$ is a set of data samples and $\mathbf{x_k}$ is one data sample. This fact allows us to take a sample from the dataset, compute updates $\mathbf{u}$ on it and then repeat this several time. In the end of the day it will produce the same results as if we had performed the gradient descent on the whole dataset at once.
+
+Unfortunately rprop does not work with small sets of subsamples\textsuperscript{\cite{tieleman2012lecture}} (\emph{minibatches}). Although such blunt simplification as taking a sign instead of the value work on whole dataset (because it effectively converges to the average value of the magnitude of the update) it does not work on small random subsamples: there we could easily obtain an update which is too large compared to what we would like to have. The next build-up on top of the rprop idea is called \emph{rmsprop} and deals with that issue.
+
+\subsubsection{RMSProp}
+When we average the results obtained using rprop method we divide by the magnitude of the gradient. RMSProps proposes to keep track of previous gradients and divide updates not by the current magnitude, but the average magnitude over the last several updates (minibatches). This will allow to modify each component $u_i$ according to its previous magnitudes, preventing from taking it into account with too large or too small weight.
 
 
 %

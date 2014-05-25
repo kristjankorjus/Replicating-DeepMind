@@ -46,4 +46,10 @@ Travis~E Oliphant.
 \newblock Python for scientific computing.
 \newblock {\em Computing in Science \& Engineering}, 9(3):10--20, 2007.
 
+\bibitem[TH12]{tieleman2012lecture}
+T~Tieleman and G~Hinton.
+\newblock Lecture 6.5-rmsprop: Divide the gradient by a running average of its
+  recent magnitude.
+\newblock {\em COURSERA: Neural Networks for Machine Learning}, 4, 2012.
+
 \end{thebibliography}

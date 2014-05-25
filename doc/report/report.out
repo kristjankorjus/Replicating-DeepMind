@@ -9,18 +9,19 @@
 \BOOKMARK [2][-]{subsection.2.1}{Launching and communicating with ALE}{section.2}% 9
 \BOOKMARK [2][-]{subsection.2.2}{Convolutional neural network}{section.2}% 10
 \BOOKMARK [2][-]{subsection.2.3}{Q-learning}{section.2}% 11
-\BOOKMARK [2][-]{subsection.2.4}{RMSProp}{section.2}% 12
-\BOOKMARK [2][-]{subsection.2.5}{And once again how all those things are put together}{section.2}% 13
-\BOOKMARK [1][-]{section.3}{Implementation details}{}% 14
-\BOOKMARK [2][-]{subsection.3.1}{Atari Learning Environment}{section.3}% 15
-\BOOKMARK [2][-]{subsection.3.2}{Preprocessing}{section.3}% 16
-\BOOKMARK [2][-]{subsection.3.3}{Memory}{section.3}% 17
-\BOOKMARK [2][-]{subsection.3.4}{Neural network}{section.3}% 18
-\BOOKMARK [2][-]{subsection.3.5}{Computing on GPU}{section.3}% 19
-\BOOKMARK [2][-]{subsection.3.6}{Running instructions}{section.3}% 20
-\BOOKMARK [1][-]{section.4}{Results}{}% 21
-\BOOKMARK [2][-]{subsection.4.1}{Performance measures}{section.4}% 22
-\BOOKMARK [2][-]{subsection.4.2}{Comparison to human player}{section.4}% 23
-\BOOKMARK [2][-]{subsection.4.3}{Comparison to the original paper}{section.4}% 24
-\BOOKMARK [2][-]{subsection.4.4}{Applications and future usage}{section.4}% 25
-\BOOKMARK [1][-]{subsection.4.4}{Bibliography}{}% 26
+\BOOKMARK [2][-]{subsection.2.4}{Root Mean Squares of gradients \(RMSProp\)}{section.2}% 12
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Stochastic gradient descent}{subsection.2.4}% 13
+\BOOKMARK [3][-]{subsubsection.2.4.2}{RMSProp}{subsection.2.4}% 14
+\BOOKMARK [1][-]{section.3}{Implementation details}{}% 15
+\BOOKMARK [2][-]{subsection.3.1}{Atari Learning Environment}{section.3}% 16
+\BOOKMARK [2][-]{subsection.3.2}{Preprocessing}{section.3}% 17
+\BOOKMARK [2][-]{subsection.3.3}{Memory}{section.3}% 18
+\BOOKMARK [2][-]{subsection.3.4}{Neural network}{section.3}% 19
+\BOOKMARK [2][-]{subsection.3.5}{Computing on GPU}{section.3}% 20
+\BOOKMARK [2][-]{subsection.3.6}{Running instructions}{section.3}% 21
+\BOOKMARK [1][-]{section.4}{Results}{}% 22
+\BOOKMARK [2][-]{subsection.4.1}{Performance measures}{section.4}% 23
+\BOOKMARK [2][-]{subsection.4.2}{Comparison to human player}{section.4}% 24
+\BOOKMARK [2][-]{subsection.4.3}{Comparison to the original paper}{section.4}% 25
+\BOOKMARK [2][-]{subsection.4.4}{Applications and future usage}{section.4}% 26
+\BOOKMARK [1][-]{subsection.4.4}{Bibliography}{}% 27
