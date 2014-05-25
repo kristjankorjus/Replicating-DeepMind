@@ -19,15 +19,15 @@
 \contentsline {subsection}{\numberline {2.4}RMSProp}{8}{subsection.2.4}
 \contentsline {subsection}{\numberline {2.5}And once again how all those things are put together}{8}{subsection.2.5}
 \contentsline {section}{\numberline {3}Implementation details}{9}{section.3}
-\contentsline {subsection}{\numberline {3.1}Agent}{9}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Memory}{9}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Preprocessing}{9}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Neural network}{9}{subsection.3.4}
-\contentsline {subsection}{\numberline {3.5}Any other implementational stuff which is worth describing}{9}{subsection.3.5}
-\contentsline {section}{\numberline {4}Results}{10}{section.4}
-\contentsline {subsection}{\numberline {4.1}Performance measures}{10}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Comparison to human player}{10}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Comparison to the original paper}{10}{subsection.4.3}
-\contentsline {subsection}{\numberline {4.4}Applications and future usage}{10}{subsection.4.4}
-\contentsline {section}{Appendix A: Running instructions}{11}{section*.10}
-\contentsline {section}{Bibliography}{12}{section*.10}
+\contentsline {subsection}{\numberline {3.1}Atari Learning Environment}{9}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Preprocessing}{9}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Memory}{10}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Neural network}{10}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Computing on GPU}{10}{subsection.3.5}
+\contentsline {subsection}{\numberline {3.6}Running instructions}{10}{subsection.3.6}
+\contentsline {section}{\numberline {4}Results}{11}{section.4}
+\contentsline {subsection}{\numberline {4.1}Performance measures}{11}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Comparison to human player}{11}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Comparison to the original paper}{11}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Applications and future usage}{11}{subsection.4.4}
+\contentsline {section}{Bibliography}{12}{subsection.4.4}

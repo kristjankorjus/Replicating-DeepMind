@@ -102,7 +102,7 @@ The system receives a picture of a game screen (an example is shown in Figure \r
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=3.5cm]{fig_gamescreen}
+\includegraphics[width=3.5cm]{images/fig_gamescreen.png}
 \caption{A game screen of Breakout.}
 \label{fig:breakoutscreen}
 \end{figure}
@@ -198,17 +198,20 @@ With these two convolutional layers we have reduced the number of nodes from 4x8
 %
 \pagebreak
 \section{Implementation details}
-Programming language: Python 2.7 (32-bit).
+The prototype of the system is built using \texttt{Python 2.7} with heavy usage of \texttt{theano}\textsuperscript{\cite{bergstra2010theano}} and \texttt{numpy}\textsuperscript{\cite{oliphant2007python}} libraries. Once the proof-of-concept stage is complete we will consider using \texttt{C++} if it will yield better performance. On Figure \ref{fig:classdiagram} we present current overall structure of the application. The subsections below will explain the particularities.
 
-Python libraries used: Pillow, NumPy, Theano.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{images/DeepMind-diag.png}
+	\caption{Class diagram representing the overall structure of the application.}
+	\label{fig:classdiagram}
+\end{figure}
 
-ATARI emulation environment: ALE (Arcade Learning Environement).
 
-\subsection{Agent}
-...
 
-\subsection{Memory}
-...
+
+\subsection{Atari Learning Environment}
+To simulate the game we use Atari Learning Environment (ALE)\textsuperscript{\cite{bellemare13arcade}}. It is a game simulator which allows to programmatically send player commands and receive the game output (image of the game screen, score, state of the game). Class \texttt{ALE} facilitates communication with the game emulator.
 
 \subsection{Preprocessing}
 \label{subsection_preproc}
@@ -220,16 +223,24 @@ The colors from ATARI's NTSC palette are converted to RGB using a conversion tab
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=2.5cm]{fig_preprocessedscreen}
+\includegraphics[width=2.5cm]{images/fig_preprocessedscreen.png}
 \caption{A preprocessed game screen of Breakout.}
 \label{fig:breakoutpreprocessed}
 \end{figure}
 
-\subsection{Neural network}
-Theano
 
-\subsection{Any other implementational stuff which is worth describing}
-Class diagram?
+\subsection{Memory}
+On of the central parts of the applications if the memory, where game states, player actions and received rewards are stored. Class \texttt{MemoryD} is a structure where all this information is stored and implements methods for storing and extracting information.
+
+
+\subsection{Neural network}
+In our implementation of the neural network we heavily rely on the \texttt{Theano} toolbox. Theano allows to define, optimize, and evaluate mathematical expressions involving multi-dimensional arrays efficiently\footnote{http://deeplearning.net/software/theano}. We closely follow the deep learning tutorial\footnote{http://www.deeplearning.net/tutorial} to define and build the neural network. Classes \texttt{ConvolutionalLayer}, \texttt{HiddenLayer} and \texttt{OutputLayer} describe building block of the network and the \texttt{NeuralNet} class puts them together and provides function for training and using the neural network.
+
+\subsection{Computing on GPU}
+As you can imagine, the computations on a neural network are highly parallelizable due to the fact that you can compute each neuron independently. Also the learning process can be parallelized to evaluate several inputs at the same time to obtain several updates in one unit of time. Theano library is able to perform the highly parallel GPU computations.
+
+\subsection{Running instructions}
+For more technical details and running instruction please refer to our wiki \url{https://github.com/kristjankorjus/Replicating-DeepMind/wiki}
 
 
 %
@@ -250,22 +261,6 @@ Yet to be performed.
 
 \subsection{Applications and future usage}
 We believe that the technique used in this system allows to solve wide variety of machine learning tasks. It will be interesting to test the system on machine learning benchmark datasets.
-
-
-
-%
-% Appendicies
-%
-\pagebreak
-\section*{Appendix A: Running instructions}
-\addcontentsline{toc}{section}{Appendix A: Running instructions}
-to test the system you should do this and that
-
-you will see that blabla
-
-this will make you happy
-
-also go to github read wiki/code there for more details
 
 
 

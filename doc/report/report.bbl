@@ -1,6 +1,21 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
 \begin{thebibliography}{MKS{\etalchar{+}}13}
 
+\bibitem[BBB{\etalchar{+}}10]{bergstra2010theano}
+James Bergstra, Olivier Breuleux, Fr{\'e}d{\'e}ric Bastien, Pascal Lamblin,
+  Razvan Pascanu, Guillaume Desjardins, Joseph Turian, David Warde-Farley, and
+  Yoshua Bengio.
+\newblock Theano: a cpu and gpu math expression compiler.
+\newblock In {\em Proceedings of the Python for scientific computing conference
+  (SciPy)}, volume~4, 2010.
+
+\bibitem[BNVB13]{bellemare13arcade}
+M.~G. {Bellemare}, Y.~{Naddaf}, J.~{Veness}, and M.~{Bowling}.
+\newblock The arcade learning environment: An evaluation platform for general
+  agents.
+\newblock {\em Journal of Artificial Intelligence Research}, 47:253--279, 06
+  2013.
+
 \bibitem[DHK13]{deng2013new}
 Li~Deng, Geoffrey Hinton, and Brian Kingsbury.
 \newblock New types of deep neural network learning for speech recognition and
@@ -25,5 +40,10 @@ Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis
   Antonoglou, Daan Wierstra, and Martin Riedmiller.
 \newblock Playing atari with deep reinforcement learning.
 \newblock {\em arXiv preprint arXiv:1312.5602}, 2013.
+
+\bibitem[Oli07]{oliphant2007python}
+Travis~E Oliphant.
+\newblock Python for scientific computing.
+\newblock {\em Computing in Science \& Engineering}, 9(3):10--20, 2007.
 
 \end{thebibliography}
