@@ -1,6 +1,25 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
 \begin{thebibliography}{MKS{\etalchar{+}}13}
 
+\bibitem[DHK13]{deng2013new}
+Li~Deng, Geoffrey Hinton, and Brian Kingsbury.
+\newblock New types of deep neural network learning for speech recognition and
+  related applications: An overview.
+\newblock In {\em Acoustics, Speech and Signal Processing (ICASSP), 2013 IEEE
+  International Conference on}, pages 8599--8603. IEEE, 2013.
+
+\bibitem[DYDA12]{dahl2012context}
+George~E Dahl, Dong Yu, Li~Deng, and Alex Acero.
+\newblock Context-dependent pre-trained deep neural networks for
+  large-vocabulary speech recognition.
+\newblock {\em Audio, Speech, and Language Processing, IEEE Transactions on},
+  20(1):30--42, 2012.
+
+\bibitem[Hin07]{hinton2007learning}
+Geoffrey~E Hinton.
+\newblock Learning multiple layers of representation.
+\newblock {\em Trends in cognitive sciences}, 11(10):428--434, 2007.
+
 \bibitem[MKS{\etalchar{+}}13]{mnih2013playing}
 Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis
   Antonoglou, Daan Wierstra, and Martin Riedmiller.
