@@ -80,13 +80,13 @@
 %
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
-In the recent years the popularity of the method called \emph{deep learning}\textsuperscript{\cite{hinton2007learning}} has increased noticeably in the machine learning community. Deep leaning was successfully applied to speech recognition\textsuperscript{\cite{dahl2012context}} and many other tasks in machine learning\textsuperscript{\cite{deng2013new}}. In all these studies the performance of the resulting system was better than other machine learning methods were able to achieve so far.
+In recent years the popularity of the method called \emph{deep learning}\textsuperscript{\cite{hinton2007learning}} has increased noticeably in the machine learning community. Deep learning was successfully applied to speech recognition\textsuperscript{\cite{dahl2012context}} and many other tasks in machine learning\textsuperscript{\cite{deng2013new}}. In all these studies the performance of the resulting system was better than other machine learning methods were able to achieve so far.
 
-The core of the deep learning method is an artificial neural network. One of the properties, which gives this family of learning algorithms a special place, is the ability to extract a ``meaningful" (from the human perspective) \emph{concepts} from the data by combining the features based on the structure of the data. The extracted concepts sometimes have clear interpretation and that makes us feel as if the machine has indeed \emph{learned} something. Here we step into the realm of artificial intelligence, the possibility of which never stops to fascinate our minds.
+The core of the deep learning method is an artificial neural network. One of the properties, which gives this family of learning algorithms a special place, is the ability to extract ``meaningful" (from a human perspective) \emph{concepts} from the data by combining the features based on the structure of the data. The extracted concepts sometimes have clear interpretation and that makes us feel as if the machine has indeed \emph{learned} something. Here we step into the realm of artificial intelligence, the possibility of which never stops to fascinate our minds.
 
-One of the recent works, which brings together deep learning and artificial intelligence is a paper ``Playing Atari with Deep Reinforcement Learning"\textsuperscript{\cite{mnih2013playing}} published by DeepMind\footnote{\url{http://deepmind.com}} company. The paper describes a system, which combines deep learning methods and the \emph{reinforcement learning} in order to create a system that is able to learn how to play simple computer games. It is worth mentioning that the system has access only to the visual information (screen of the game) and the scores. Based on these two inputs the system learns to understand which moves are good and which are bad depending on the situation on the screen. Notice that the human player uses exactly same information to evaluate his performance and adapt his playing strategy. The reported result shows that the system was able to master several different games and play some of them better than the human player.
+A recent work, which brings together deep learning and artificial intelligence is a paper ``Playing Atari with Deep Reinforcement Learning"\textsuperscript{\cite{mnih2013playing}} published by DeepMind\footnote{\url{http://deepmind.com}} company. The paper describes a system that combines deep learning methods and \emph{reinforcement learning} in order to create a system that is able to learn how to play simple computer games. It is worth mentioning that the system has access only to the visual information (screen of the game) and the scores. Based on these two inputs the system learns to understand which moves are good and which are bad depending on the situation on the screen. Notice that a human player uses exactly same information to evaluate her performance and adapt her playing strategy. The reported result shows that the system was able to master several different games and play some of them better than a human player.
 
-This result can be seen as a step forward to the truly intelligent machines and thus it fascinates us. The goal of this project is to create an open-source analogue of such a system using the description provided in the paper.
+This result can be seen as a step towards truly intelligent machines and thus it fascinates us. The goal of this project is to create an open-source analogue of such a system using the description provided in the paper.
 
 
 
@@ -126,7 +126,7 @@ The output layer has one node for each possible action and the activation of tho
 
 \subsection{Learning process}
 \label{sec:learningprocess}
-Under the fancy word ``neural network" hides a quite simple idea: bunch of \emph{nodes} (neurons), each of them having some \emph{input} to perform a computation on and an \emph{output} where the result of the computation will be sent to, are connected to each other. Each connection has a \emph{weight}, which regulates how much one neuron can affect another. The very first layer of the network is usually called the \emph{input layer}. This is the place where we inject a data sample. Next to the input layer the network has several trickily connected \emph{hidden layers}. And the last layer is an \emph{output layer}, it gives us the final piece of information we wanted to know about the data sample we fed into the network. The resulting structure can be very complex, but the building blocks are always the same: neurons and connections between them.
+Under the fancy word ``neural network" hides a quite simple idea: a bunch of \emph{nodes} (neurons), each of them having some \emph{input} to perform a computation on and an \emph{output} where the result of the computation will be sent to, are connected to each other. Each connection has a \emph{weight}, which regulates how much one neuron can affect another. The very first layer of the network is usually called the \emph{input layer}. This is the place where we inject a data sample. Next to the input layer the network has several trickily connected \emph{hidden layers}. And the last layer is an \emph{output layer}, it gives us the final piece of information we wanted to know about the data sample we fed into the network. The resulting structure can be very complex, but the building blocks are always the same: neurons and connections between them.
 
 We, as the builders of the system, usually know what we want it do: that is for each data sample we know what the final output should look like. Now the ``smart" neural network is the one able to produce the output we expect, the ``naive" network is the one which is not. The only thing that differs in those two are the \emph{weights} on the connections between the nodes. By changing them in accordance with our final goal the network goes from being ``naive" to being ``smart". This process in general in known as \emph{learning}.
 
@@ -134,7 +134,7 @@ To explain the concept of learning to the machine we introduce the notion of \em
 
 The obvious way to minimize a function is to try out all possible inputs to find the minimal output. Unfortunately the number of possible input is unfeasibly large. How to do it is a big question not only for our system. The whole brach on computer science called \emph{optimization} is dealing with this issue. One of the most popular technique used in this area is called \emph{gradient descent}.
 
-The idea of gradient descent is rather trivial: at each \emph{iteration} of the learning algorithm it makes a small step in the ``direction" which makes the value of the loss function smaller. Thus by making enough steps the algorithm will reach an \emph{optimum}: a place from where step in any direction will only increase the value of the loss function. Once this optimum is found we say that the learning has finished and the system is now as smart as it can be. It might happen that the optimum we found is not the best one (\emph{local optimum}), and there are bunch of techniques (for example \emph{Monte Carlo} methods) to find the \emph{global optimum}, but we will not dwell into this right now. 
+The idea of gradient descent is rather trivial: at each \emph{iteration} of the learning algorithm it makes a small step in the ``direction" which makes the value of the loss function smaller. Thus by making enough steps the algorithm will reach an \emph{optimum}: a place from where a step in any direction will only increase the value of the loss function. Once this optimum is found we say that the learning has finished and the system is now as smart as it can be. It might happen that the optimum we found is not the best one (\emph{local optimum}), and there are bunch of techniques (for example \emph{Monte Carlo} methods) to find the \emph{global optimum}, but we will not dwell into this right now. 
 
 Gradient descent uses the \emph{gradient} (multidimensional derivative) as it's core:
 \begin{enumerate}
@@ -147,7 +147,7 @@ Gradient descent uses the \emph{gradient} (multidimensional derivative) as it's 
 	\end{enumerate}
 	\item Repeat starting from the step 2. until the derivatives with respect to all parameters of the system are zeros (or close to zeros)
 \end{enumerate}
-Once this process is complete we believe that our system has reached the optimal state: it's parameters are configures in such way that it will give optimal performance on the dataset we have. In our system we will use variation of the idea of gradient descent called RMSProp, you will read about it later.
+Once this process is complete, we believe that our system has reached the optimal state: its parameters are configures in such way that it will give optimal performance on the dataset we have. In our system we will use variation of the idea of gradient descent called RMSProp, you will read about it later.
 
 
 
@@ -157,14 +157,14 @@ Once this process is complete we believe that our system has reached the optimal
 \pagebreak
 \section{Components of the system}
 
-In this section we indent to describe all the key components of the system in the detail. Description should reflect all the choices we made, justify them and explain how the component works.
+In this section we intend to describe all the key components of the system in detail. This description should reflect all the choices we made, justify them and explain how the components work.
 
 
 
 \subsection{Launching and communicating with ALE}
 Just as we, humans, exchange information with a computer game by seeing the computer screen (input) and pressing the keys (output actions), the system needs to communicate with the Arcade Learning Environment that hosts the game.
 \paragraph{}
-The communication with ALE is achieved using two first-in-first out pipes which must be created before the ALE is launched. We create the pipes and launch ALE using the os package of Python. The parameters given to ALE at execution must specify the way we want to communicate with ALE (FIFO pipes) and the location of the binary file containing the game to run (Breakout). In addition, we specify that we want ALE to return unencoded images, that only every 4th frame should be sent to us and whether the game window should be made visible.
+Communication with ALE is achieved using two first-in-first-out (FIFO) pipes which must be created before ALE is launched. We create the pipes and launch ALE using the \verb=os= package of Python. The parameters given to ALE at execution must specify the way we want to communicate with ALE (FIFO pipes) and the location of the binary file containing the game to run (Breakout). In addition, we specify that we want ALE to return unencoded images, that only every 4th frame should be sent to us and whether the game window should be made visible.
 
 
 \paragraph{}
@@ -173,11 +173,14 @@ The actual communication starts with a handshake phase, where we define the desi
 
 
 \subsection{Convolutional neural network}
-Our system receives $4 \times 84 \times 84$ pixel values as input. In order to find relevant information from these four 84x84 images, we use convolutional neural networks (CNN)\textsuperscript{\cite{lecun1995convolutional}}. CNNs are a specific type of neural network that are particularly adapted to extract features from images.
+Our system receives $4 \times 84 \times 84$ pixel values as input. In order to find relevant information from these four $84 \times 84$ images, we use convolutional neural networks (CNN)\textsuperscript{\cite{lecun1995convolutional}}. CNNs are a specific type of neural network that are particularly adapted to extracting features from images.
 
-Unlike RBMs which see their input as an 1D vector, a CNN treats the input images as 2D objects. These 2D matrices of pixel values are convolved with linear filters to obtain the activities of the next layer. For example, our first hidden layer is generated by convolving our images with sixteen different $8 \times 8$ filters, using a step of 4 pixels. This means that for each of the 16 different filters, we first take the topleft $8 \times 8$ values of an image and linearly combine them with the filter, obtaining as a result one activity value. We then move 4 pixels left and multiply another $8  \times 8$ area from the image with the same filter (same weight values). When reaching the right edge of the image, we start again from the left, only 4 pixels lower. Each linear combination yields one activity value, so convolving an $84  \times 84$ image with an $8 \times 8$ filter with step 4 produces $20 \times 20$ topologically arranged values. As we apply 16 different filters, we end up with $16 \cdot 20 \cdot 20$ nodes in the first hidden layer of our convolutional network.
+Unlike restricted Boltzmann machines (RBMs) that see their input as an 1D vector, a CNN treats the input images as 2D objects. These 2D matrices of pixel values are convolved with linear filters to obtain the activities of the next layer. For example, our first hidden layer is generated by convolving our images with sixteen different $8 \times 8$ filters, using a step of 4 pixels. This means that for each of the 16 different filters, we first take the top left $8 \times 8$ values of an image and linearly combine them with the filter, obtaining as a result one activity value. We then move 4 pixels to the right and multiply another $8  \times 8$ area from the image with the same filter.   When reaching the right edge of the image, we start again from the left, only 4 pixels lower. There are $8  \cdot 8 \cdot 4$ weights in a filter of this kind and the same weights (the same filter) is applied at different positions of the image, as described.
 
-An attentive reader notices that our input consists of 4 images, not only one. This means that each of our filters contains four weight matrices of size $8 \times 8$. The images will be convolved with the corresponding $8 \times 8$ matrix and the calculated activities are summed up, so we end up with $16 \cdot 20 \cdot 20$ values as before. All in all, $W^{KL}_{ij}$ denotes the weight value connecting the pixel value on coordinates $(i,j)$ of the selected 8x8 area of the $L$-th image with the $K$-th feature map.
+Each linear combination yields one activity value, so convolving an $84  \times 84$ image with an $8 \times 8$ filter with step 4 produces $20 \times 20$ topologically arranged values. As we apply 16 different filters, we end up with $16 \cdot 20 \cdot 20$ nodes in the first hidden layer of our convolutional network. 
+
+An attentive reader will notice that our input consists of 4 images, not one. This means that each of our filters contains four weight matrices of size $8 \times 8$. The images will be convolved with the corresponding $8 \times 8$ matrix and the calculated activities are summed, so we end up with $16 \cdot 20 \cdot 20$ values as before.
+%All in all, $W^{KL}_{ij}$ denotes the weight value connecting the pixel value on coordinates $(i,j)$ of the selected 8x8 area of the $L$-th image with the $K$-th feature map.
 
 Last but not least, a linear rectifier is applied to the activity values, setting all negative values to 0.
 
@@ -185,9 +188,15 @@ The obtained sixteen $20 \times 20$ feature maps are thereafter convolved with 3
 
 With these two convolutional layers we have reduced the number of nodes from $4 \times 84 \times 84$ to $32 \times 9 \times 9$. Functionally, after training the system we expect the nodes of the second hidden layer to represent spatiotemporal patterns relevant for successfully playing the game.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Convolutional_NN2.png}
+	\caption{A diagram representing the organisation of the deep neural network used. The two last rows show the number of nodes and the number of independent weights.}
+	\label{fig:neuralnet}
+\end{figure}
 
 \subsection{Q-learning}
-In Section \ref{sec:reinforcementlearning} we introduced the notion of reinforcement learning: each time an agents performs an action he receives reward or punishment and updates his behavior rules accordingly. One of very popular methods to implement this concept is called Q-learning\textsuperscript{\cite{watkins1992q}}.
+In Section \ref{sec:reinforcementlearning} we introduced the notion of reinforcement learning: each time an agent performs an action, it receives a reward or punishment and updates its behavior rules accordingly. One very popular method for implementing this concept is called Q-learning\textsuperscript{\cite{watkins1992q}}.
 
 The program is in a state $s_t \in \mathcal{S}$ and wants to know which action $a_t \in \mathcal{A}$ it should do to maximize the reward $r \in \mathds{R}$. So the typing of the function $Q$ is as follows:
 $$Q: \mathcal{S} \times \mathcal{A} \rightarrow  \mathds{R}$$
@@ -196,10 +205,10 @@ $$Q_{t+1}(s_t, a_t) = Q_t(s_t, a_t) + \alpha\cdot(r_{t+1} + \gamma\cdot\max_{a}Q
 where
 \begin{itemize}
 	\itemsep 0em
-	\item[] $Q_t(s_t, a_t)$ is the reward I thought I will get if I do action $a_t$ while being in state $s_t$
+	\item[] $Q_t(s_t, a_t)$ is the reward I thought I will get if I do action $a_t$ while being in state $s_t$. In our implementation, this is calculated using the deep neural network.
 	\item[] $r_t+1$ is the reward I actually got for doing action $a_t$ while being in state $s_t$
-	\item[] $\alpha$ is learning reate
-	\item[] $\gamma$ is a \emph{discount factor} which says how much should I take into the consideration the future rewards along this path
+	\item[] $\alpha$ is the learning rate
+	\item[] $\gamma$ is a \emph{discount factor} which says how much should I take into consideration the future rewards along this path
 	\item[] $max_{a}Q(s_{t+1}, a)$ is what I think will be the best reward available from the next state (future reward)
 \end{itemize}
 
@@ -212,12 +221,12 @@ If you can use all of your data to estimate the direction of the gradient, then 
 \subsubsection{Stochastic gradient descent}
 As you know, if you have a set of differentiable functions, then the sum of these functions is also differentiable and the derivative of this function is equal to the sum of the derivatives of these functions:
 $$\nabla f(\mathbf{w}, \mathbf{x}) = \displaystyle\sum\nabla g(\mathbf{w}, \mathbf{x_k})$$
-where $\mathbf{x}$ is a set of data samples and $\mathbf{x_k}$ is one data sample. This fact allows us to take a sample from the dataset, compute updates $\mathbf{u}$ on it and then repeat this several time. In the end of the day it will produce the same results as if we had performed the gradient descent on the whole dataset at once.
+where $\mathbf{x}$ is a set of data samples and $\mathbf{x_k}$ is one data sample. This fact allows us to take a sample from the dataset, compute updates $\mathbf{u}$ on it and then repeat this several time. At the end of the day it will produce the same results as if we had performed the gradient descent on the whole dataset at once.
 
-Unfortunately rprop does not work with small sets of subsamples\textsuperscript{\cite{tieleman2012lecture}} (\emph{minibatches}). Although such blunt simplification as taking a sign instead of the value work on whole dataset (because it effectively converges to the average value of the magnitude of the update) it does not work on small random subsamples: there we could easily obtain an update which is too large compared to what we would like to have. The next build-up on top of the rprop idea is called \emph{rmsprop} and deals with that issue.
+Unfortunately rprop does not work with small sets of subsamples\textsuperscript{\cite{tieleman2012lecture}} (\emph{minibatches}). Although the blunt simplification of taking the gradient sign instead of the value works when we use the whole dataset (because it effectively converges to the average value of the magnitude of the update) it does not work on small random subsamples: there we could easily obtain an update which is too large compared to what we would like to have. The next build-up on top of the rprop idea is called \emph{rmsprop} and deals with that issue.
 
 \subsubsection{RMSProp}
-When we average the results obtained using rprop method we divide by the magnitude of the gradient. RMSProps proposes to keep track of previous gradients and divide updates not by the current magnitude, but the average magnitude over the last several updates (minibatches). This will allow to modify each component $u_i$ according to its previous magnitudes, preventing from taking it into account with too large or too small weight.
+When we average the results obtained using rprop method we divide by the magnitude of the gradient. RMSProp proposes to keep track of previous gradients and divide updates not by the current magnitude, but the average magnitude over the last several updates (minibatches). This will allow to modify each component $u_i$ according to its previous magnitudes, preventing from taking it into account with too large or too small weight.
 
 
 %
