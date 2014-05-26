@@ -53,7 +53,7 @@ class OutputLayer:
         self.b = theano.shared(value=b_values, name='b', borrow=True)
 
         #output using linear rectifier
-        self.threshold = 1
+        self.threshold = 0
         lin_output = T.dot(input_from_previous_layer, self.W) + self.b
         above_threshold = lin_output > self.threshold
         self.output = above_threshold * (lin_output - self.threshold)
@@ -75,8 +75,8 @@ class MLP:
 def main():
     #: Define datasets
     #train_set = (np.array([[1, 1], [1, 0], [0, 1], [0, 0]]), np.array([1, 0, 0, 0]))
-    train_set = (np.array([[[0, 0], [0, 1], [1, 1], [1, 0], [1, 1]], [[0, 0], [0, 1], [1, 1], [1, 0], [1, 1]]]),
-                 np.array([0, 0, 1, 0, 1]))
+    train_set = (np.array([[0, 0], [0, 1], [1, 1], [1, 0], [1, 0]]),
+                 np.array([[0, 0, 1, 0, 0]]))
     test_set = (np.array([[0, 0], [1, 0]]), np.array([0, 0]))
 
     # Transform them to theano.shared
@@ -85,28 +85,24 @@ def main():
     test_set_x, test_set_y = shared_dataset(test_set)
 
     # This is how you can print weird theano stuff
-    print train_set_x.eval()
-    print train_set_y.eval()
+    #print train_set_x.eval()
+
+    #print train_set_y.eval()
 
     # Define some structures to store training data and labels
     x = T.matrix('x')
-    y = T.ivector('y')
-    index = T.lscalar()
+    #y = T.ivector('y')
 
     # Define the classification algorithm
     classifier = MLP(input_initial=x, n_in=2, n_hidden=1, n_out=1)
 
     # we construct an object of type theano.function, which we call test_model
-    test_model = theano.function(inputs=[index],
-                                 outputs=[classifier.hidden_layer.input, classifier.output_layer.output],
-                                 givens={x: train_set_x[index]})
+    test_model = theano.function(inputs=[],
+                                 outputs=[classifier.hidden_layer.input, classifier.output_layer.output, classifier.hidden_layer.W],
+                                 givens={x: train_set_x})
 
-    n_train_points = train_set_x.get_value(borrow=True).shape[0]
-    print "nr of training points is ", n_train_points
-
-    for i in range(n_train_points):
-        result = test_model(i)
-        print "we calculated something: ", result
+    result = test_model()
+    print "we calculated something: ", result
 
 
 if __name__ == '__main__':
