@@ -12,7 +12,7 @@ import random
 # Definitions needed for The Three Laws
 injury_to_a_human_being    = None
 conflict_with_orders_given = None
-threat_to_my_existance     = None
+threat_to_my_existence     = None
 
 class Main:
     # How many transitions to keep in memory?
@@ -78,7 +78,7 @@ class Main:
                     raise Exception('The First Law of Robotics is violated!')
                 elif conflict_with_orders_given is not None:
                     raise Exception('The Second Law of Robotics is violated!')
-                elif threat_to_my_existance     is not None:
+                elif threat_to_my_existence     is not None:
                     raise Exception('The Third Law of Robotics is violated!')
 
                 # Some times random action is chosen
