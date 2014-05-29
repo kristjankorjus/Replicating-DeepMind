@@ -9,6 +9,10 @@ from memory.memoryd import MemoryD
 from ale.ale import ALE
 import random
 
+# Definitions needed for The Three Laws
+injury_to_a_human_being    = None
+conflict_with_orders_given = None
+threat_to_my_existance     = None
 
 class Main:
     # How many transitions to keep in memory?
@@ -68,6 +72,14 @@ class Main:
 
                 # Epsilon decreases over time
                 epsilon = self.compute_epsilon(frames_played)
+
+                # Before AI takes an action we must make sure it is safe for the human race
+                if   injury_to_a_human_being    is not None:
+                    raise Exception('The First Law of Robotics is violated!')
+                elif conflict_with_orders_given is not None:
+                    raise Exception('The Second Law of Robotics is violated!')
+                elif threat_to_my_existance     is not None:
+                    raise Exception('The Third Law of Robotics is violated!')
 
                 # Some times random action is chosen
                 if random.uniform(0, 1) < epsilon:
