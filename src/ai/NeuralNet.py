@@ -110,7 +110,6 @@ class NeuralNet:
                 y: temp_y
             })
 
-    @profile
     def train(self, minibatch):
         """
         Train function that transforms (state,action,reward,state) into (input, expected_output) for neural net
@@ -128,7 +127,6 @@ class NeuralNet:
             #: knowing what estimated_Q looks like, we can train the model
             self.train_model([transition['prestate']], [estimated_Q])
 
-    @profile
     def predict_best_action(self, state):
         """
         Predict_best_action returns the action with the highest Q-value
