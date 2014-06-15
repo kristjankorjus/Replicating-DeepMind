@@ -206,7 +206,7 @@ where
 \begin{itemize}
 	\itemsep 0em
 	\item[] $Q_t(s_t, a_t)$ is the reward I thought I will get if I do action $a_t$ while being in state $s_t$. In our implementation, this is calculated using the deep neural network.
-	\item[] $r_t+1$ is the reward I actually got for doing action $a_t$ while being in state $s_t$
+	\item[] $r_{t+1}$ is the reward I actually got for doing action $a_t$ while being in state $s_t$
 	\item[] $\alpha$ is the learning rate
 	\item[] $\gamma$ is a \emph{discount factor} which says how much should I take into consideration the future rewards along this path
 	\item[] $max_{a}Q(s_{t+1}, a)$ is what I think will be the best reward available from the next state (future reward)
