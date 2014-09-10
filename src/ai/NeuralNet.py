@@ -88,7 +88,7 @@ class NeuralNet:
 
         #: define the training operation as applying the updates calculated given temp_x and temp_y
         self.train_model = theano.function(inputs=[temp_x, temp_y],
-                                           outputs=[cost],
+                                           outputs=[cost , self.params[0][0]],
                                            updates=updates,
                                            givens={
                                                x: temp_x,
@@ -122,12 +122,20 @@ class NeuralNet:
         #  received on transition and the maximum of future rewards. Q-s for other actions remain the same.
         for i, transition in enumerate(minibatch):
             estimated_Q = self.predict_rewards([transition['prestate']])[0][0]
+
+            #: line prints out the output of the network, uncomment it if you want to verify that different
+            #  inputs give different outputs (c.f. wiki Basic tests/Issue #10)
             #print "estimated q", estimated_Q
-            #print np.max(self.predict_rewards([transition['prestate']]))
+
             estimated_Q[transition['action']] = transition['reward'] + self.gamma \
                                                 * np.max(self.predict_rewards([transition['poststate']]))
             #: knowing what estimated_Q looks like, we can train the model
-            self.train_model([transition['prestate']], [estimated_Q])
+            cost, first_filter = self.train_model([transition['prestate']], [estimated_Q])
+
+            #: next line prints out the weight values in the first line of the first 8x8 filter in first conv layer,
+            #  uncomment it if you want to make sure the weight values do indeed change as the result of learning
+            #  (c.f. wiki Basic tests/Issue #7)
+            #print "first line of filter applied to first img of first layer is:  \n", first_filter[0][0]
 
     def predict_best_action(self, state):
         """
@@ -135,4 +143,5 @@ class NeuralNet:
         @param state: 4D array, input (game state) for which we want to know the best action
         """
         predicted_values_for_actions = self.predict_rewards(state)[0][0]
+        #print "predicted best action", predicted_values_for_actions
         return  np.argmax(predicted_values_for_actions)

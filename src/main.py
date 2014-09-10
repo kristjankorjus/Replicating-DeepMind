@@ -72,7 +72,7 @@ class Main:
 
                 # Epsilon decreases over time
                 epsilon = self.compute_epsilon(frames_played)
-                print "espilon is", epsilon
+                #print "espilon is", epsilon
                 # Before AI takes an action we must make sure it is safe for the human race
                 if   injury_to_a_human_being    is not None:
                     raise Exception('The First Law of Robotics is violated!')
