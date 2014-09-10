@@ -122,8 +122,10 @@ class NeuralNet:
         #  received on transition and the maximum of future rewards. Q-s for other actions remain the same.
         for i, transition in enumerate(minibatch):
             estimated_Q = self.predict_rewards([transition['prestate']])[0][0]
+            #print "estimated q", estimated_Q
+            #print np.max(self.predict_rewards([transition['prestate']]))
             estimated_Q[transition['action']] = transition['reward'] + self.gamma \
-                                                * np.max(self.predict_rewards([transition['prestate']]))
+                                                * np.max(self.predict_rewards([transition['poststate']]))
             #: knowing what estimated_Q looks like, we can train the model
             self.train_model([transition['prestate']], [estimated_Q])
 

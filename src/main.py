@@ -49,7 +49,7 @@ class Main:
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         @param frames_played: How far are we with our learning?
         """
-        return max(0.9 - frames_played / self.memory_size, 0.1)
+        return max(0.9 - frames_played / (self.memory_size * 1.0), 0.1)
 
 
     def play_games(self, n):
@@ -72,7 +72,7 @@ class Main:
 
                 # Epsilon decreases over time
                 epsilon = self.compute_epsilon(frames_played)
-
+                print "espilon is", epsilon
                 # Before AI takes an action we must make sure it is safe for the human race
                 if   injury_to_a_human_being    is not None:
                     raise Exception('The First Law of Robotics is violated!')
@@ -84,11 +84,11 @@ class Main:
                 # Some times random action is chosen
                 if random.uniform(0, 1) < epsilon:
                     action = random.choice(range(self.number_of_actions))
-                    print "chose randomly ", action
+                    #print "chose randomly ", action
 
                 # Usually neural net chooses the best action
                 else:
-                    print "chose by neural net"
+                    #print "chose by neural net"
                     action = self.nnet.predict_best_action([self.memory.get_last_state()])
                     print action
 
@@ -101,7 +101,7 @@ class Main:
                 # Start a training session
 
                 self.nnet.train(self.memory.get_minibatch(self.minibatch_size))
-
+                frames_played += 1
             # After "game over" increase the number of games played
             games_played += 1
 
