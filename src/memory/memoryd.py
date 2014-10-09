@@ -4,6 +4,8 @@ Memory stores game data and provides means work with it
 
 """
 
+#TODO solve the issue of when we reach the limit of 1M samples, need to change add functions and solve the question of what to do on the border of new and old samples
+
 import numpy as np
 import random
 
@@ -72,21 +74,24 @@ class MemoryD:
         """
         Take n Transitions from the memory.
         One transition includes (state, action, reward, state)
+        Returns ndarray with 4 lists inside (at Tambet's request)
         @param size: size of the minibatch (in our case it should be 32)
         """
 
-        transitions = []
-
+        prestates=[]
+        actions=[]
+        rewards=[]
+        poststates=[]
         #: Pick random n indices and save dictionary if not terminal state
-        while len(transitions) < size:
+        while len(actions) < size:
             i = random.randint(0, self.count - 1)
-            if self.actions[i] != 100:
-                transitions.append({'prestate': self.get_state(i),
-                                    'action': self.actions[i],
-                                    'reward': self.rewards[i],
-                                    'poststate': self.get_state(i + 1)})
+            if self.actions[i] != 100: #if not endstate
+                prestates.append(self.get_state(i))
+                actions.append(self.actions[i])
+                rewards.append(self.rewards[i])
+                poststates.append(self.get_state(i+1))
 
-        return transitions
+        return [prestates,actions,rewards,poststates]
 
     def get_state(self, index):
         """
@@ -114,7 +119,8 @@ class MemoryD:
         else:
             state = self.screens[index - 3:index + 1]
 
-        return state
+		# neural network expects flat input and np.ravel does just that
+        return np.ravel(state)
 
     def get_last_state(self):
         """

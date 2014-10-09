@@ -39,8 +39,7 @@ class Main:
         self.number_of_actions = 4  # Game "Breakout" has 4 possible actions
 
         # Properties of the neural net which come from the paper
-        self.nnet = NeuralNet([1, 4, 84, 84], filter_shapes=[[16, 4, 8, 8], [32, 16, 4, 4]],
-                              strides=[4, 2], n_hidden=256, n_out=self.number_of_actions)
+        self.nnet = NeuralNet()
         self.ale = ALE(self.memory)
 
     def compute_epsilon(self, frames_played):
@@ -89,7 +88,7 @@ class Main:
                 # Usually neural net chooses the best action
                 else:
                     #print "chose by neural net"
-                    action = self.nnet.predict_best_action([self.memory.get_last_state()])
+                    action = self.nnet.predict_best_action(self.memory.get_last_state())
                     print action
 
                 # Make the move
