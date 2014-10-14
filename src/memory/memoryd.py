@@ -33,10 +33,10 @@ class MemoryD:
         :type self: object
         @param n: the number of game steps we need to store
         """
-        self.screens = np.zeros((n, 84, 84), dtype=np.uint8)
-        self.actions = np.zeros((n,), dtype=np.uint8)
-        self.rewards = np.zeros((n,), dtype=np.uint8)
-        self.time = np.zeros((n,), dtype=np.uint32)
+        self.screens = np.empty((n, 84, 84), dtype=np.float32)
+        self.actions = np.empty((n,), dtype=np.uint8)
+        self.rewards = np.empty((n,), dtype=np.float32)
+        self.time = np.empty((n,), dtype=np.uint32)
         self.count = -1
 
     def add_first(self, next_screen):
@@ -77,27 +77,31 @@ class MemoryD:
         Returns ndarray with 4 lists inside (at Tambet's request)
         @param size: size of the minibatch (in our case it should be 32)
         """
-
-        prestates=[]
-        actions=[]
-        rewards=[]
-        poststates=[]
+        print "get_minibatch()"
+        prestates = np.empty((84 * 84 * 4, size), dtype = np.float32)
+        actions = np.empty((size), dtype = np.float32)
+        rewards = np.empty((size), dtype = np.float32)
+        poststates = np.empty((84 * 84 * 4, size), dtype = np.float32)
         #: Pick random n indices and save dictionary if not terminal state
-        while len(actions) < size:
+        j = 0
+        while j < size:
             i = random.randint(0, self.count - 1)
-            if self.actions[i] != 100: #if not endstate
-                prestates.append(self.get_state(i))
-                actions.append(self.actions[i])
-                rewards.append(self.rewards[i])
-                poststates.append(self.get_state(i+1))
+            if self.actions[i] != 100: # if not endstate
+                prestates[:,j] = self.get_state(i)
+                actions[j] = self.actions[i]
+                rewards[j] = self.rewards[i]
+                poststates[:,j] = self.get_state(i + 1)
+                j += 1
 
-        return [prestates,actions,rewards,poststates]
+        return [prestates, actions, rewards, poststates]
 
     def get_state(self, index):
         """
         Extract one state (4 images) given last image position
         @param index: global location of the 4th image in the memory
         """
+
+        print "get_state(", index, ")"
 
         #: We always need 4 images to compose one state. In the beginning of the
         #  game (at time moments 0, 1, 2) we do not have enough images in the memory
@@ -106,15 +110,15 @@ class MemoryD:
         pad_screens = 3 - self.time[index]
         if pad_screens > 0:
 
-            state = []
+            state = np.empty((4, 84, 84), dtype = np.float32)
 
             #: Pad missing images with the first image
             for p in range(pad_screens):
-                state.append(self.screens[index - 3 + pad_screens])
+                state[p] = self.screens[index - 3 + pad_screens]
 
             #: Fill the rest of the images as they are
             for p in range(pad_screens, 4):
-                state.append(self.screens[index - (4 - p - 1)])
+                state[p] = self.screens[index - 3 + p]
 
         else:
             state = self.screens[index - 3:index + 1]
@@ -127,4 +131,6 @@ class MemoryD:
         Get last 4 images from the memory. Those images will go as an input for
         the neural network
         """
+
+        print "get_last_state()"
         return self.get_state(self.count)

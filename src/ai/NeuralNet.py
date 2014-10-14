@@ -50,13 +50,18 @@ class NeuralNet(ConvNet):
         actions = minibatch[1]
         rewards = minibatch[2]
         next_states = minibatch[3]
-        nextrewards = np.max(self.predict(next_states), axis=0)
+        #print "train(): ", type(states), np.shape(states), type(next_states), np.shape(next_states)
+        nextrewards = np.max(self.predict(next_states), axis=1)
+        #print "nextrewards: ", type(nextrewards), np.shape(nextrewards), nextrewards
         scores = self.predict(states)
+        #print "actions: ", type(actions), np.shape(actions)
+        #print "scores: ", type(scores), np.shape(scores)
         # we have to update the Q-vals for the actions we actually performed
-        for i,action in enumerate(actions):
+        for i, action in enumerate(actions):
+            #print "for loop:", i, action
             scores[i][action]= rewards[i] + self.discount * nextrewards[i]
         
-        self.libmodel.startBatch([states, scores], 1, false) # second parameter is 'progress', third parameter means 'only test, don't train'
+        self.libmodel.startBatch([states, scores.transpose().copy()], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
         cost = self.libmodel.finishBatch()
         return cost
 
@@ -65,19 +70,22 @@ class NeuralNet(ConvNet):
         Predict returns neural network output layer activations for input
         @param input: input data for neural network
         """
-        batch_size = np.shape(states)[0]
-        scores = np.zeros((batch_size, self.num_outputs), dtype=np.single)
-        self.libmodel.startFeatureWriter(states, [scores], [self.output_layer_name])
+        batch_size = np.shape(states)[1]
+        scores = np.zeros((batch_size, self.num_outputs), dtype=np.float32)
+        #print "types are:", type(states), np.shape(states), type(scores), np.shape(scores)
+        self.libmodel.startFeatureWriter([states, scores.transpose().copy()], [scores], [self.output_layer_name])
+        #print "done with featurewriter"
         self.libmodel.finishBatch()
         # now activations of output layer should be in 'scores'
+        #print "predict(): ", type(scores), np.shape(scores)
         return scores
 
-    def predict_best_action(self, state):
-		# predict() expects input as a matrix
-        states = np.reshape(last_state, (1,len(last_state)))
-        print "shape of predict", np.shape(self.predict(states))
-		# return action with maximum score
-        return np.argmax(self.predict(states)[0])
+    def predict_best_action(self, last_state):
+        print "predict_best_action(): ", np.shape(last_state)
+        # predict() expects input as a list of data-lines
+        states = np.reshape(last_state, (len(last_state), 1))
+        scores = self.predict(states)
+        return np.argmax(scores)
 
     #remove options we do not need
     @classmethod
@@ -91,7 +99,10 @@ class NeuralNet(ConvNet):
         op.options["test_batch_range"].default="0"
         op.options["dp_type"].default="image"
         op.options["data_path"].default="/storage/hpc_kristjan/cuda-convnet4" # TODO: remove this
-
+        op.options["layer_def"].default="ai/deepmind-layers.cfg"
+        op.options["layer_params"].default="ai/deepmind-params.cfg"
+        #op.options["save_path"].default="/storage/hpc_kristjan/DeepMind"
+        op.options["dp_type"].default="deepmind"
         DataProvider.register_data_provider('deepmind', 'DeepMind data provider', DeepmindDataProvider)
 
         return op

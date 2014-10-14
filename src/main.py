@@ -8,6 +8,7 @@ from ai.NeuralNet import NeuralNet
 from memory.memoryd import MemoryD
 from ale.ale import ALE
 import random
+import numpy as np
 
 # Definitions needed for The Three Laws
 injury_to_a_human_being    = None
@@ -65,10 +66,10 @@ class Main:
         while games_played < games_to_play:
             # Start a new game
             self.ale.new_game()
-
+            print "starting game ", games_played+1
             # Play until game is over
             while not self.ale.game_over:
-
+                #print "frame nr", frames_played
                 # Epsilon decreases over time
                 epsilon = self.compute_epsilon(frames_played)
                 #print "espilon is", epsilon
@@ -87,7 +88,7 @@ class Main:
 
                 # Usually neural net chooses the best action
                 else:
-                    #print "chose by neural net"
+                    print "### chose by neural net: "
                     action = self.nnet.predict_best_action(self.memory.get_last_state())
                     print action
 
@@ -98,8 +99,10 @@ class Main:
                 self.ale.store_step(action)
 
                 # Start a training session
-
-                self.nnet.train(self.memory.get_minibatch(self.minibatch_size))
+                print "starting to train"
+                batch = self.memory.get_minibatch(self.minibatch_size)
+                #print "batch shape",np.shape(batch)
+                self.nnet.train(batch)
                 frames_played += 1
             # After "game over" increase the number of games played
             games_played += 1
@@ -110,4 +113,5 @@ class Main:
 
 if __name__ == '__main__':
     m = Main()
-    m.play_games(1)
+    m.play_games(3)
+    print "played ", m.memory.count, "frames in 3 games"
