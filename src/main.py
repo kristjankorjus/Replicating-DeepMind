@@ -84,13 +84,12 @@ class Main:
                 # Some times random action is chosen
                 if random.uniform(0, 1) < epsilon:
                     action = random.choice(range(self.number_of_actions))
-                    #print "chose randomly ", action
+                    print "chose randomly: ", action
 
                 # Usually neural net chooses the best action
                 else:
-                    print "### chose by neural net: "
                     action = self.nnet.predict_best_action(self.memory.get_last_state())
-                    print action
+                    print "chose by neural net: ", action
 
                 # Make the move
                 self.ale.move(action)
