@@ -30,7 +30,6 @@ class MemoryD:
     #: global index counter
     count = None
 
-
     def __init__(self, n):
         """
         Initialize memory structure 
@@ -82,7 +81,6 @@ class MemoryD:
         Returns ndarray with 4 lists inside (at Tambet's request)
         @param size: size of the minibatch (in our case it should be 32)
         """
-        #print "get_minibatch()"
         prestates = np.empty((84 * 84 * 4, size), dtype = np.float32)
         actions = np.empty((size), dtype = np.float32)
         rewards = np.empty((size), dtype = np.float32)
@@ -109,8 +107,6 @@ class MemoryD:
         Extract one state (4 images) given last image position
         @param index: global location of the 4th image in the memory
         """
-
-        #print "get_state(", index, ")"
 
         #: We always need 4 images to compose one state. In the beginning of the
         #  game (at time moments 0, 1, 2) we do not have enough images in the memory
@@ -141,8 +137,7 @@ class MemoryD:
             else:
                 state = self.screens[index - 3:index + 1]
 
-	# neural network expects flat input and np.ravel does just that
-        #print "returning state: ", np.ravel(state).shape
+		# neural network expects flat input and np.ravel does just that
         return np.ravel(state)
 
     def get_last_state(self):
@@ -151,5 +146,4 @@ class MemoryD:
         the neural network
         """
 
-        #print "get_last_state()"
         return self.get_state(self.count)

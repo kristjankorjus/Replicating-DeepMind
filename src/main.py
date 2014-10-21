@@ -85,7 +85,6 @@ class Main:
                     raise Exception('The Third Law of Robotics is violated!')
 
                 # Some times random action is chosen
-                # epsilon = 0 # while testing, we want to always run a feed-forward and choose action by nnet 
                 if random.uniform(0, 1) < epsilon:
                     action = random.choice(range(self.number_of_actions))
                     # print "chose randomly ", action

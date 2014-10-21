@@ -6,7 +6,6 @@ NeuralNet class creates a Q-learining network by binding together different neur
 
 from convnet import *
 import numpy as np
-import random
 
 class DeepmindDataProvider:
     def __init__(self, data_dir, batch_range=None, init_epoch=1, init_batchnum=None, dp_params=None, test=False):
@@ -27,12 +26,11 @@ class NeuralNet(ConvNet):
         Initialize a NeuralNet
 
         @param output_layer_name: name of the output (actions) layer
+        @param discount_factor: discount factor for future rewards
         '''
         # Initialise ConvNet, including self.libmodel
         op = NeuralNet.get_options_parser()
-        print op.options.keys()
         op, load_dic = IGPUModel.parse_options(op)
-        print op.options.keys()
         ConvNet.__init__(self, op, load_dic)
 
 		# Remember parameters and some useful variables
@@ -45,8 +43,7 @@ class NeuralNet(ConvNet):
         """
         Train function that transforms (state,action,reward,state) into (input, expected_output) for neural net
         and trains the network
-        @param minibatch: array of dictionaries, each dictionary contains
-        one transition (prestate,action,reward,poststate)
+        @param minibatch: list of arrays: prestates, actions, rewards, poststates
         """
         
         states = minibatch[0]
@@ -54,38 +51,41 @@ class NeuralNet(ConvNet):
         rewards = minibatch[2]
         next_states = minibatch[3]
 
-        nextrewards = np.max(self.predict(next_states), axis=1)
+        # predict scores for poststates
+        next_scores = self.predict(next_states)
+        # take maximum score of all actions
+        max_scores = np.max(next_scores, axis=1)
+        # predict scores for prestates, so we can keep scores for other actions unchanged
         scores = self.predict(states)
-
-        # we have to update the Q-vals for the actions we actually performed
-        temp = scores.copy()
+        # update the Q-values for the actions we actually performed
         for i, action in enumerate(actions):
-            scores[i][action] = rewards[i] + self.discount * nextrewards[i]
-            #scores[i][action] = 1.0 + self.discount * nextrewards[i]
+            scores[i][action]= rewards[i] + self.discount * max_scores[i]
         
+        # start training in GPU
         self.libmodel.startBatch([states, scores.transpose().copy()], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
+        # wait until processing has finished
         cost = self.libmodel.finishBatch()
-
+        # return cost (error)
         return cost
 
     def predict(self, states):
         """
         Predict returns neural network output layer activations for input
-        @param input: input data for neural network
+        @param states: numpy.ndarray of states
         """
         batch_size = np.shape(states)[1]
-        scores = np.ones((batch_size, self.num_outputs), dtype=np.float32)
-        #print "types are:", type(states), np.shape(states), type(scores), np.shape(scores)
+        scores = np.zeros((batch_size, self.num_outputs), dtype=np.float32)
+
+        # start feed-forward pass in GPU
         self.libmodel.startFeatureWriter([states, scores.transpose().copy()], [scores], [self.output_layer_name])
-        #print "done with featurewriter"
+        # wait until processing has finished
         self.libmodel.finishBatch()
+
         # now activations of output layer should be in 'scores'
-        #print "predict(): ", type(scores), np.shape(scores)
         return scores
 
     def predict_best_action(self, last_state):
-        #print "predict_best_action(): ", np.shape(last_state)
-        # predict() expects input as a list of data-lines
+        # last_state contains only one state, so we have to convert it into batch of size 1
         states = np.reshape(last_state, (len(last_state), 1))
         scores = self.predict(states)
         #print "the predicted q-values are: ", scores
