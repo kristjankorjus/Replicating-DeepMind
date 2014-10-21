@@ -49,7 +49,7 @@ class Main:
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         @param frames_played: How far are we with our learning?
         """
-        return max(0.9 - frames_played / (self.memory_size * 1.0), 0.1)
+        return max(1.0 - frames_played / (500000 * 1.0), 0.1)
 
 
     def play_games(self, n):
@@ -121,5 +121,5 @@ class Main:
 
 if __name__ == '__main__':
     m = Main()
-    nr_games = 5000
+    nr_games = 50000
     m.play_games(nr_games)
