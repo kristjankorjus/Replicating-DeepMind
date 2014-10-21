@@ -117,3 +117,4 @@ class ALE:
         self.next_image, episode_info = self.fin.readline()[:-2].split(":")
         self.game_over = bool(int(episode_info.split(",")[0]))
         self.current_reward = int(episode_info.split(",")[1])
+        return self.current_reward

@@ -60,7 +60,6 @@ docs/_build/
 
 # ALE
 libraries/ale/ale
-libraries/ale/makefile
 libraries/ale/tags
 state/
 src/ale_fifo*
