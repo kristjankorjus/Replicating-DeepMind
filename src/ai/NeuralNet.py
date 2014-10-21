@@ -6,6 +6,7 @@ NeuralNet class creates a Q-learining network by binding together different neur
 
 from convnet import *
 import numpy as np
+import random
 
 class DeepmindDataProvider:
     def __init__(self, data_dir, batch_range=None, init_epoch=1, init_batchnum=None, dp_params=None, test=False):
@@ -38,6 +39,7 @@ class NeuralNet(ConvNet):
         self.discount = discount_factor
         self.output_layer_name = output_layer_name
         self.num_outputs = self.layers[output_layer_name]['outputs']
+        self.output_file = open("Q_history.csv","w")
 
     def train(self, minibatch):
         """
@@ -46,23 +48,24 @@ class NeuralNet(ConvNet):
         @param minibatch: array of dictionaries, each dictionary contains
         one transition (prestate,action,reward,poststate)
         """
+        
         states = minibatch[0]
         actions = minibatch[1]
         rewards = minibatch[2]
         next_states = minibatch[3]
-        #print "train(): ", type(states), np.shape(states), type(next_states), np.shape(next_states)
+
         nextrewards = np.max(self.predict(next_states), axis=1)
-        #print "nextrewards: ", type(nextrewards), np.shape(nextrewards), nextrewards
         scores = self.predict(states)
-        #print "actions: ", type(actions), np.shape(actions)
-        #print "scores: ", type(scores), np.shape(scores)
+
         # we have to update the Q-vals for the actions we actually performed
+        temp = scores.copy()
         for i, action in enumerate(actions):
-            #print "for loop:", i, action
-            scores[i][action]= rewards[i] + self.discount * nextrewards[i]
+            scores[i][action] = rewards[i] + self.discount * nextrewards[i]
+            #scores[i][action] = 1.0 + self.discount * nextrewards[i]
         
         self.libmodel.startBatch([states, scores.transpose().copy()], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
         cost = self.libmodel.finishBatch()
+
         return cost
 
     def predict(self, states):
@@ -71,7 +74,7 @@ class NeuralNet(ConvNet):
         @param input: input data for neural network
         """
         batch_size = np.shape(states)[1]
-        scores = np.zeros((batch_size, self.num_outputs), dtype=np.float32)
+        scores = np.ones((batch_size, self.num_outputs), dtype=np.float32)
         #print "types are:", type(states), np.shape(states), type(scores), np.shape(scores)
         self.libmodel.startFeatureWriter([states, scores.transpose().copy()], [scores], [self.output_layer_name])
         #print "done with featurewriter"
@@ -81,10 +84,13 @@ class NeuralNet(ConvNet):
         return scores
 
     def predict_best_action(self, last_state):
-        print "predict_best_action(): ", np.shape(last_state)
+        #print "predict_best_action(): ", np.shape(last_state)
         # predict() expects input as a list of data-lines
         states = np.reshape(last_state, (len(last_state), 1))
         scores = self.predict(states)
+        #print "the predicted q-values are: ", scores
+        self.output_file.write(str(scores).strip().replace(' ', ',')[2:-2] + '\n')
+        self.output_file.flush()
         return np.argmax(scores)
 
     #remove options we do not need

@@ -17,7 +17,7 @@ threat_to_my_existence     = None
 
 class Main:
     # How many transitions to keep in memory?
-    memory_size = 100000
+    memory_size = 200000
 
     # Memory itself
     memory = None
@@ -61,12 +61,15 @@ class Main:
         games_to_play = n
         games_played = 0
         frames_played = 0
+        game_scores=[]
+        f=open("scores.txt","w")
 
         # Play games until maximum number is reached
         while games_played < games_to_play:
             # Start a new game
             self.ale.new_game()
-            print "starting game ", games_played+1
+            print "starting game ", games_played+1, " frames played so far: ", frames_played
+            game_score=0
             # Play until game is over
             while not self.ale.game_over:
                 #print "frame nr", frames_played
@@ -82,36 +85,42 @@ class Main:
                     raise Exception('The Third Law of Robotics is violated!')
 
                 # Some times random action is chosen
+                # epsilon = 0 # while testing, we want to always run a feed-forward and choose action by nnet 
                 if random.uniform(0, 1) < epsilon:
                     action = random.choice(range(self.number_of_actions))
-                    #print "chose randomly ", action
+                    # print "chose randomly ", action
 
                 # Usually neural net chooses the best action
                 else:
-                    print "### chose by neural net: "
                     action = self.nnet.predict_best_action(self.memory.get_last_state())
-                    print action
+                    #print "### chose by neural net: ",action
 
                 # Make the move
-                self.ale.move(action)
-
+                reward = self.ale.move(action)
+                game_score += reward
                 # Store new information to memory
                 self.ale.store_step(action)
 
                 # Start a training session
-                print "starting to train"
+                #print "starting to train"
                 batch = self.memory.get_minibatch(self.minibatch_size)
                 #print "batch shape",np.shape(batch)
                 self.nnet.train(batch)
                 frames_played += 1
             # After "game over" increase the number of games played
             games_played += 1
+            
+            # write the game score to a file 
+            f.write(str(game_score)+"\n")
+            f.flush()
 
             # And do stuff after end game (store information, let ALE know etc)
             self.ale.end_game()
 
+        print game_scores
+        f.close()
 
 if __name__ == '__main__':
     m = Main()
-    m.play_games(3)
-    print "played ", m.memory.count, "frames in 3 games"
+    nr_games = 5000
+    m.play_games(nr_games)
