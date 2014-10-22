@@ -1,14 +1,21 @@
+#!/bin/bash
+
 #
 #   Run this file from the project root to install all required libraries:
-#       * Compile ALE under
-#           ../bin/ale
+#       * Compile ALE under             ../bin/ale
+#       * Compile cuda-convnet2 under   ../bin/cuda-convnet2
 #
 
-# store current directory name and go in ALE directory
+
+# ---
+# ALE
+# ---
+
+# Store current directory name and go in ALE directory
 cwd=$(pwd)
 cd ./libraries/ale
 
-# prepare Makefiles based on OS, choose makefile with no SDL(no GUI)
+# Prepare Makefiles based on OS, choose makefile with no SDL(no GUI)
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     cp makefile_noGUI.unix makefile
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -18,18 +25,34 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
     cp makefile_noGUI.unix makefile
 elif [[ "$OSTYPE" == "win32" ]]; then
     echo "Windows is not supported. Terminating."
+    exit
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
     echo "WARNING: Not tested under FreeBSD"
     cp makefile_noGUI.unix makefile
 else
     echo "Unknown OS. Terminating."
+    exit
 fi
 
-# compile ALE
+# Compile ALE
 make
 
-# go back to the main directory
+# Go back to the main directory
 cd "$cwd"
 
-# run ALE
+# Test ALE
 ./libraries/ale/ale -help
+
+
+# -------------
+# cuda-convnet2
+# -------------
+
+# Go to cuda-convnet directory
+cd ./libraries/cuda-convnet2
+
+# Compile cuda-convnet2
+./build.sh
+
+# Go back to the main directory
+cd "$cwd"
