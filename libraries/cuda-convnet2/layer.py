@@ -746,7 +746,7 @@ class EltwiseSumLayerParser(LayerWithInputParser):
     def add_params(self, mcp):
         LayerWithInputParser.add_params(self, mcp)
         dic, name = self.dic, self.dic['name']
-        dic['coeffs'] = mcp.safe_get_float_list(name, 'coeffs', default=[1.0] * len(dic['inputs']))
+        dic['coeffs'] = mcp.safe_get_float_list(name, 'coeffs', default=[1.0, -1.0])
     
     def parse(self, name, mcp, prev_layers, model):
         dic = LayerWithInputParser.parse(self, name, mcp, prev_layers, model)
