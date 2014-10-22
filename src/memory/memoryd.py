@@ -82,8 +82,8 @@ class MemoryD:
         @param size: size of the minibatch (in our case it should be 32)
         """
         prestates = np.empty((84 * 84 * 4, size), dtype = np.float32)
-        actions = np.empty((size), dtype = np.float32)
-        rewards = np.empty((size), dtype = np.float32)
+        actions = np.empty((size), dtype=np.float32)
+        rewards = np.empty((size), dtype=np.float32)
         poststates = np.empty((84 * 84 * 4, size), dtype = np.float32)
         #: Pick random n indices and save dictionary if not terminal state
         j = 0
@@ -93,11 +93,11 @@ class MemoryD:
             while i > (self.count % self.size) and (i-(self.count % self.size)) < 4:
                 i = random.randint(0, np.min([self.count, self.size]) - 1)
 
-            if self.actions[i] != 100: # if not endstate
-                prestates[:,j] = self.get_state(i)
+            if self.actions[i] != 100:  # if not endstate
+                prestates[:, j] = self.get_state(i)
                 actions[j] = self.actions[i]
                 rewards[j] = self.rewards[i]
-                poststates[:,j] = self.get_state(i + 1)
+                poststates[:, j] = self.get_state(i + 1)
                 j += 1
 
         return [prestates, actions, rewards, poststates]
@@ -114,12 +114,10 @@ class MemoryD:
         #  first available image as many times as needed to fill missing ones.
 
         index = index % self.size
-        #print index, self.size, self.count, self.time[index]
-        #print "###################"
         pad_screens = 3 - self.time[index]
         if pad_screens > 0:
 
-            state = np.empty((4, 84, 84), dtype = np.float32)
+            state = np.empty((4, 84, 84), dtype=np.float32)
 
             #: Pad missing images with the first image
             for p in range(pad_screens):
@@ -137,7 +135,7 @@ class MemoryD:
             else:
                 state = self.screens[index - 3:index + 1]
 
-		# neural network expects flat input and np.ravel does just that
+        # neural network expects flat input and np.ravel does just that
         return np.ravel(state)
 
     def get_last_state(self):

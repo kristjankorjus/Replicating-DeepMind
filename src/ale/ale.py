@@ -7,6 +7,7 @@ import numpy as np
 from preprocessor import Preprocessor
 import traceback
 
+
 class ALE:
     actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
     current_reward = 0
@@ -47,7 +48,7 @@ class ALE:
         self.fin = open('ale_fifo_out')
         self.fout = open('ale_fifo_in', 'w')
         
-        input=self.fin.readline()[:-1]
+        input = self.fin.readline()[:-1]
         size = input.split("-")  # saves the image sizes (160*210) for breakout
 
         #: first thing we send to ALE is the output options- we want to get only image data

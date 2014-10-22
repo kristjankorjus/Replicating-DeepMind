@@ -1,40 +1,42 @@
-'''
+"""
 
 NeuralNet class creates a Q-learining network by binding together different neural network layers
 
-'''
+"""
 
 from convnet import *
 import numpy as np
 import time
+
 
 class DeepmindDataProvider:
     def __init__(self, data_dir, batch_range=None, init_epoch=1, init_batchnum=None, dp_params=None, test=False):
         pass
 
     def get_data_dims(self, idx=0):
-		# TODO: these numbers shouldn't be hardcoded
+        # TODO: these numbers shouldn't be hardcoded
         if idx == 0:
             return 4*84*84
         if idx == 1:
             return 4
         return 1
 
+
 class NeuralNet(ConvNet):
 
-    def __init__(self, output_layer_name = 'layer4', discount_factor = 0.9):
-        '''
+    def __init__(self, output_layer_name='layer4', discount_factor=0.9):
+        """
         Initialize a NeuralNet
 
         @param output_layer_name: name of the output (actions) layer
         @param discount_factor: discount factor for future rewards
-        '''
+        """
         # Initialise ConvNet, including self.libmodel
         op = NeuralNet.get_options_parser()
         op, load_dic = IGPUModel.parse_options(op)
         ConvNet.__init__(self, op, load_dic)
 
-		# Remember parameters and some useful variables
+        # Remember parameters and some useful variables
         self.discount = discount_factor
         self.output_layer_name = output_layer_name
         self.num_outputs = self.layers[output_layer_name]['outputs']
