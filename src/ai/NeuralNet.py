@@ -41,6 +41,8 @@ class NeuralNet(ConvNet):
         self.output_layer_name = output_layer_name
         self.num_outputs = self.layers[output_layer_name]['outputs']
         self.output_file = open("../log/Q_history"+time.strftime("%Y-%m-%d-%H-%M")+".csv","w")
+        self.epoch = 0
+        self.batchnum = 0
 
     def train(self, minibatch):
         """
