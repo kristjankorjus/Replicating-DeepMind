@@ -16,6 +16,8 @@ develop-eggs/
 dist/
 eggs/
 lib/
+log/
+src/log/
 lib64/
 parts/
 sdist/
