@@ -63,7 +63,7 @@ class Main:
         games_played = 0
         frames_played = 0
         game_scores = []
-        f = open("scores" + time.strftime("%Y-%m-%d-%H-%M") + ".txt", "w")
+        f = open("../log/scores" + time.strftime("%Y-%m-%d-%H-%M") + ".txt", "w")
 
         # Play games until maximum number is reached
         while games_played < games_to_play:
