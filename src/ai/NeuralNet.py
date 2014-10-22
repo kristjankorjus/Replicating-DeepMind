@@ -1,6 +1,6 @@
 """
 
-NeuralNet class creates a Q-learining network by binding together different neural network layers
+NeuralNet class creates a neural network.
 
 """
 
@@ -101,8 +101,8 @@ class NeuralNet(ConvNet):
         op.options["data_path"].default="/storage/hpc_kristjan/cuda-convnet4" # TODO: remove this
         op.options["layer_def"].default="ai/deepmind-layers.cfg"
         op.options["layer_params"].default="ai/deepmind-params.cfg"
-        op.options["save_path"].default="."
-        op.options["gpu"].default="0"
+        #op.options["save_path"].default="."
+        #op.options["gpu"].default="0"
         op.options["dp_type"].default="simple"
  
         DataProvider.register_data_provider('simple', 'Simple data provider', SimpleDataProvider)

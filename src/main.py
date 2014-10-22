@@ -10,6 +10,7 @@ from ale.ale import ALE
 import random
 import numpy as np
 import time
+import cPickle
 
 # Definitions needed for The Three Laws
 injury_to_a_human_being    = None
@@ -61,9 +62,12 @@ class Main:
 
         # last_state contains only one state, so we have to convert it into batch of size 1
         last_state.shape = (last_state.shape[0], 1)
-        scores = self.predict(last_state)
-        assert scores.shape[0] == self.number_of_actions
+        scores = self.nnet.predict(last_state)
+        assert scores.shape[1] == self.number_of_actions
 
+        self.output_file.write(str(scores).strip().replace(' ', ',')[2:-2] + '\n')
+        self.output_file.flush()
+        
         # return action (index) with maximum score
         return np.argmax(scores)
 
@@ -118,7 +122,8 @@ class Main:
         games_played = 0
         frames_played = 0
         game_scores = []
-        f = open("../log/scores" + time.strftime("%Y-%m-%d-%H-%M") + ".txt", "w")
+        scores_file = open("../log/scores" + time.strftime("%Y-%m-%d-%H-%M") + ".txt", "w")
+        self.output_file = open("../log/Q_history"+time.strftime("%Y-%m-%d-%H-%M")+".csv","w")
 
         # Play games until maximum number is reached
         while games_played < games_to_play:
@@ -127,6 +132,7 @@ class Main:
             self.ale.new_game()
             print "starting game", games_played+1, "frames played so far:", frames_played
             game_score = 0
+            self.nnet.epoch = games_played
 
             # Play until game is over
             while not self.ale.game_over:
@@ -165,15 +171,34 @@ class Main:
             # After "game over" increase the number of games played
             games_played += 1
             
+            # Store game state every 100 games
+            if games_played % 100 == 0:
+
+                # Store state of the network as cpickle as Convnet does
+                self.nnet.sync_with_host()
+                self.nnet.save_state()
+            
+                # Store the weights and biases of all layers
+                layers_list=["layer1","layer2","layer3","layer4"]
+                layer_dict = {}
+                for layer_name in layers_list:
+                    w = m.nnet.layers[layer_name]["weights"][0].copy()
+                    b = m.nnet.layers[layer_name]["biases"][0].copy()
+                    layer_dict[layer_name] = {'weights': w, 'biases': b}
+                filename = "../log/weights_at_" + str(games_played) + "_games.pkl"
+                weights_file = open(filename, "wb")
+                cPickle.dump(layer_dict, weights_file)
+                weights_file.close()
+
             # write the game score to a file 
-            f.write(str(game_score)+"\n")
-            f.flush()
+            scores_file.write(str(game_score)+"\n")
+            scores_file.flush()
 
             # And do stuff after end game (store information, let ALE know etc)
             self.ale.end_game()
 
         print game_scores
-        f.close()
+        scores_file.close()
 
 if __name__ == '__main__':
     m = Main()
