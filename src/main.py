@@ -124,17 +124,6 @@ if __name__ == '__main__':
     m = Main()
     nr_games = 100000
     m.play_games(nr_games)
-    """#print m.nnet.layers["layer4"],"\n ############################### \n"
-    print len(m.nnet.layers["layer4"]["weights"])
-    w1= m.nnet.layers["layer4"]["weights"][0]
-    b1= m.nnet.layers["layer4"]["biases"][0]
-    print b1[:10]
-    print w1[:10]
-    #print m.nnet.layers["layer4"].keys()
-    m.play_games(nr_games)
-    w2= m.nnet.layers["layer4"]["weights"][0]
-    b2= m.nnet.layers["layer4"]["biases"][0]
-
-    print "biases: ", b1[:10], b2[:10]
-    print "weights: ", w1[:10], w2[:10]"""
+    #m.nnet.sync_with_host()
+    #w1= m.nnet.layers["layer4"]["weights"][0].copy()
 

@@ -112,16 +112,17 @@ class ALE:
 
         #: Write and send to ALE stuff
         self.fout.write(str(action)+",0\n")
+        print str(action)+",0\n"
         self.fout.flush()
 
         #: Read from ALE
         line = self.fin.readline()
+        print line
         try:
             self.next_image, episode_info = line[:-2].split(":")
         except:
-            traceback.print_exc() 
-            print line
-        finally:
+            print "got an error in reading stuff from ALE"
+            traceback.print_exc()
             exit()
         self.game_over = bool(int(episode_info.split(",")[0]))
         self.current_reward = int(episode_info.split(",")[1])
