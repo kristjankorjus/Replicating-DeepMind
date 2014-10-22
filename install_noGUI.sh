@@ -2,8 +2,8 @@
 
 #
 #   Run this file from the project root to install all required libraries:
-#       * Compile ALE under             ../bin/ale
-#       * Compile cuda-convnet2 under   ../bin/cuda-convnet2
+#       * Compile ALE under             ../libraries/ale
+#       * Compile cuda-convnet2 under   ../libraries/cuda-convnet2
 #
 
 
@@ -47,6 +47,9 @@ cd "$cwd"
 # -------------
 # cuda-convnet2
 # -------------
+
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/opencv/2.4.5/lib64:$HOME/libjpeg/lib:$HOME/cuda-convnet2/util:$HOME/cuda-convnet2/nvmatrix:$HOME/cuda-convnet2/cudaconv3" >> ~./bash_profile
+echo "export PYTHONPATH=$HOME/cuda-convnet2" >>  ~./bash_profile
 
 # Go to cuda-convnet directory
 cd ./libraries/cuda-convnet2

@@ -2,8 +2,8 @@
 
 #
 #   Run this file from the project root to install all required libraries:
-#       * Compile ALE under             ../bin/ale
-#       * Compile cuda-convnet2 under   ../bin/cuda-convnet2
+#       * Compile ALE under             ../libraries/ale
+#       * Compile cuda-convnet2 under   ../libraries/cuda-convnet2
 #
 
 
