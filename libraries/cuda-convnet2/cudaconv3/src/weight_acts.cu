@@ -2020,7 +2020,7 @@ void _weightActs(NVMatrix& images, NVMatrix& hidActs, NVMatrix& targets,
     
     assert(numImgColors % numGroups == 0);
     assert(numFilters % (16*numGroups) == 0);
-    assert(numGroups > 1 || (numImgColors > 0 && (numImgColors <= 3 || numImgColors % 16 == 0)));
+    assert(numGroups > 1 || (numImgColors > 0 && (numImgColors <= 4 || numImgColors % 16 == 0)));
     assert(numGroups == 1 || numFilterColors % 16 == 0);
     assert(imgSizeY * imgSizeX == imgPixels);
     assert(images.getNumRows() == imgPixels * numImgColors);
@@ -2056,7 +2056,7 @@ void _weightActs(NVMatrix& images, NVMatrix& hidActs, NVMatrix& targets,
     int pixelsPerThread, filtersPerThread, colorsPerThread;
     // Worth playing with these parameters to find best values for your problem.
     // These values work relatively well, but not optimal for all problems.
-    if (numFilterColors > 3) {
+    if (numFilterColors > 4) {
         filtersPerThread = numFiltersPerGroup % 64 == 0 ? 4
                         : numFiltersPerGroup % 32 == 0 ? 2
                         : 1;
