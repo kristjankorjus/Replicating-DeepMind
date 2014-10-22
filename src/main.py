@@ -9,6 +9,7 @@ from memory.memoryd import MemoryD
 from ale.ale import ALE
 import random
 import numpy as np
+import time
 
 # Definitions needed for The Three Laws
 injury_to_a_human_being    = None
@@ -17,7 +18,7 @@ threat_to_my_existence     = None
 
 class Main:
     # How many transitions to keep in memory?
-    memory_size = 200000
+    memory_size = 300000
 
     # Memory itself
     memory = None
@@ -49,7 +50,7 @@ class Main:
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         @param frames_played: How far are we with our learning?
         """
-        return max(1.0 - frames_played / (500000 * 1.0), 0.1)
+        return max(1.0 - frames_played / (1000000 * 1.0), 0.1)
 
 
     def play_games(self, n):
@@ -62,7 +63,7 @@ class Main:
         games_played = 0
         frames_played = 0
         game_scores=[]
-        f=open("scores.txt","w")
+        f=open("scores"+ time.strftime("%Y-%m-%d-%H-%M")+".txt","w")
 
         # Play games until maximum number is reached
         while games_played < games_to_play:
@@ -121,5 +122,19 @@ class Main:
 
 if __name__ == '__main__':
     m = Main()
-    nr_games = 50000
+    nr_games = 100000
     m.play_games(nr_games)
+    """#print m.nnet.layers["layer4"],"\n ############################### \n"
+    print len(m.nnet.layers["layer4"]["weights"])
+    w1= m.nnet.layers["layer4"]["weights"][0]
+    b1= m.nnet.layers["layer4"]["biases"][0]
+    print b1[:10]
+    print w1[:10]
+    #print m.nnet.layers["layer4"].keys()
+    m.play_games(nr_games)
+    w2= m.nnet.layers["layer4"]["weights"][0]
+    b2= m.nnet.layers["layer4"]["biases"][0]
+
+    print "biases: ", b1[:10], b2[:10]
+    print "weights: ", w1[:10], w2[:10]"""
+

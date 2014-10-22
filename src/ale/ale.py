@@ -5,7 +5,7 @@ ALE class launches the ALE game and manages the communication with it
 import os
 import numpy as np
 from preprocessor import Preprocessor
-
+import traceback
 
 class ALE:
     actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
@@ -114,7 +114,14 @@ class ALE:
         self.fout.flush()
 
         #: Read from ALE
-        self.next_image, episode_info = self.fin.readline()[:-2].split(":")
+        line = self.fin.readline()
+        try:
+            self.next_image, episode_info = line[:-2].split(":")
+        except:
+            traceback.print_exc() 
+            print line
+        finally:
+            exit()
         self.game_over = bool(int(episode_info.split(",")[0]))
         self.current_reward = int(episode_info.split(",")[1])
         return self.current_reward

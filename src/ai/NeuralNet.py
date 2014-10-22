@@ -6,6 +6,7 @@ NeuralNet class creates a Q-learining network by binding together different neur
 
 from convnet import *
 import numpy as np
+import time
 
 class DeepmindDataProvider:
     def __init__(self, data_dir, batch_range=None, init_epoch=1, init_batchnum=None, dp_params=None, test=False):
@@ -37,7 +38,7 @@ class NeuralNet(ConvNet):
         self.discount = discount_factor
         self.output_layer_name = output_layer_name
         self.num_outputs = self.layers[output_layer_name]['outputs']
-        self.output_file = open("Q_history.csv","w")
+        self.output_file = open("Q_history"+time.strftime("%Y-%m-%d-%H-%M")+".csv","w")
 
     def train(self, minibatch):
         """
