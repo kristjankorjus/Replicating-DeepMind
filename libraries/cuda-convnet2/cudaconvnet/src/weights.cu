@@ -296,22 +296,22 @@ void Weights::aggregateReplicaGradients(float progress) {
         //
 
         // Compute squared gradients to use in RMSProp
-        NVMatrix squared_grads;
-        *gradShards[getReplicaID()]->apply(NVMatrixOps::Square(), squared_grads);
+        NVMatrix* squared_grads = NULL;
+        gradShards[getReplicaID()]->apply(NVMatrixOps::Square(), *squared_grads);
 
         // Update moving average which is used to scale gradient values
-        _weightsRMS->add(squared_grads, 0.9, 0.1);
+        _weightsRMS->add(*squared_grads, 0.9, 0.1);
 
         // Take square root because in the RMSProp we divide by sqrt(moving_average) not by moving_average itself
         NVMatrix sqrt_RMS;
-        _weightsRMS.apply(NVMatrixOps::Sqrt(), sqrt_RMS);
+        _weightsRMS->apply(NVMatrixOps::Sqrt(), sqrt_RMS);
 
         // Divide gradients by the sqrt(moving_average)
         NVMatrix normalized_grad;
-        *gradShards[getReplicaID()]->divide(sqrt_RMS, normalized_grad);
+        gradShards[getReplicaID()]->eltwiseDivide(sqrt_RMS, normalized_grad);
 
         // Store final gradient update values
-        _weightsInc->add(normalized_grad, 0, gradScale)
+        _weightsInc->add(normalized_grad, 0, gradScale);
 
     }
 
