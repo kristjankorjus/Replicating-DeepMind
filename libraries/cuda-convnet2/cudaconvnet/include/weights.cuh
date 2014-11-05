@@ -68,8 +68,8 @@ public:
 
 class Weights {
 protected:
-    Matrix* _hWeights, *_hWeightsInc;
-    NVMatrix* _weights, *_weightsInc, *_weightsGrad, *_weightsRMS;
+    Matrix* _hWeights, *_hWeightsInc, *_hWeightsRMS;
+    NVMatrix* _weights, *_weightsInc, *_weightsRMS, *_weightsGrad;
     
     ParameterSchedule* _lrs;
 

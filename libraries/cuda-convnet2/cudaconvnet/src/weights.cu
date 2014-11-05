@@ -117,6 +117,8 @@ void Weights::init(Matrix& hWeights, Matrix& hWeightsInc, ParameterSchedule& lrs
     _srcWeights = NULL;
     _hWeights = &hWeights;
     _hWeightsInc = &hWeightsInc;
+    _hWeightsRMS = new Matrix(_hWeights->getNumRows(), _hWeights->getNumCols());
+    _hWeightsRMS->apply(Matrix::ZERO);
     _numUpdates = 0;
     _lrs = &lrs;
     _parent = &parent;
@@ -128,10 +130,10 @@ void Weights::init(Matrix& hWeights, Matrix& hWeightsInc, ParameterSchedule& lrs
     _weights = NULL;
     _weightsInc = NULL;
     _weightsGrad = NULL;
+    _weightsRMS = NULL;
     _cleanup = cleanup;
     _reducer = NULL;
     _broadcaster = NULL;
-    _weightsRMS = NULL;
 }
 
 Weights::~Weights() {
@@ -141,10 +143,12 @@ Weights::~Weights() {
     if (_cleanup) {
         delete _hWeights;
         delete _hWeightsInc;
+        delete _hWeightsRMS;
         if (_srcWeights == NULL) {
             delete _weights;
             delete _weightsInc;
             delete _weightsGrad;
+            delete _weightsRMS;
         }
     }
 }
@@ -240,8 +244,12 @@ void Weights::copyToCPU() {
             Matrix& hIncShard = getShard(*_hWeightsInc);
             _weightsInc->copyToHost(hIncShard);
             delete &hIncShard;
+            Matrix& hRMSShard = getShard(*_hWeightsRMS);
+            _weightsRMS->copyToHost(hRMSShard);
+            delete &hRMSShard;
         } else { // In this case there's definitely only one replica
             _weightsInc->copyToHost(*_hWeightsInc);
+            _weightsRMS->copyToHost(*_hWeightsRMS);
         }
     }
 }
@@ -254,6 +262,7 @@ void Weights::copyToGPU() {
     if (_srcWeights == NULL) {
         _weights = _weights == NULL ? new NVMatrix() : _weights;
         _weightsInc = _weightsInc == NULL ? new NVMatrix() : _weightsInc;
+        _weightsRMS = _weightsRMS == NULL ? new NVMatrix() : _weightsRMS;
         _weights->copyFromHost(*_hWeights, true);
 
         if (_useGrad) {
@@ -262,14 +271,19 @@ void Weights::copyToGPU() {
             Matrix& hIncShard = getShard(*_hWeightsInc);
             _weightsInc->copyFromHost(hIncShard, true);
             delete &hIncShard;
+            Matrix& hRMSShard = getShard(*_hWeightsRMS);
+            _weightsRMS->copyFromHost(hRMSShard, true);
+            delete &hRMSShard;
         } else {
             _weightsInc->copyFromHost(*_hWeightsInc, true);
+            _weightsRMS->copyFromHost(*_hWeightsRMS, true);
         }
 
         _weightsGrad = _useGrad ? (_weightsGrad == NULL ? new NVMatrix(*_weights) : _weightsGrad) : NULL;
     } else {
         _weights = _srcWeights->_weights;
         _weightsInc = _srcWeights->_weightsInc;
+        _weightsRMS = _srcWeights->_weightsRMS;
         _weightsGrad = _srcWeights->_weightsGrad;
     }
     _onGPU = true;
@@ -278,6 +292,7 @@ void Weights::copyToGPU() {
 void Weights::aggregateReplicaGradients(float progress) {
     map<int, NVMatrix*> gradShards;
     map<int, NVMatrix*> wShards;
+    //printf("%s: aggregateReplicaGradients(%f) ver12\n", _parent->getName().c_str(), progress);
     for (map<int,Weights*>::const_iterator it = _replicas.begin(); it != _replicas.end(); ++it) {
         gradShards[it->first] = &getShard(it->second->getGrad(), getReplicaID());
         wShards[it->first] = &getShard(it->second->getW(), getReplicaID());
@@ -285,34 +300,33 @@ void Weights::aggregateReplicaGradients(float progress) {
     }
 
     float gradScale = _lrs->getValue(progress);
+    float gamma = 0.9;
+    float epsilon = 1E-12;
     NVMatrix::setDeviceID(getDeviceID());
+
+    NVMatrix *grads = gradShards[getReplicaID()];
+    //printf("%s: grads before: ", _parent->getName().c_str()); grads->print(1,1);
+    //printf("%s: _weightsRMS before: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+    // Add squared gradient to weightsRMS, width gradient weighted by 1-gamma and previous weightsRMS weighted by gamma
+    _weightsRMS->applyBinary(NVMatrixBinaryOps::CompositeSecond<NVMatrixOps::Square, NVMatrixBinaryOps::WeightedAdd>
+        (NVMatrixOps::Square(), NVMatrixBinaryOps::WeightedAdd(gamma, 1 - gamma)), *grads);
+    //printf("%s: _weightsRMS before epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+    // Add epsilon to _weightsRMS before dividing, so it is never 0
+    _weightsRMS->addScalar(epsilon);
+    // Divide gradient by squared root of mean squared gradients
+    grads->applyBinary(NVMatrixBinaryOps::CompositeSecond<NVMatrixOps::Sqrt, NVMatrixBinaryOps::Divide>
+        (NVMatrixOps::Sqrt(), NVMatrixBinaryOps::Divide()), *_weightsRMS);
+    // Undo epsilon
+    _weightsRMS->addScalar(-epsilon);
+    //printf("%s: _weightsRMS after epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+    //printf("%s: grads after: ", _parent->getName().c_str()); grads->print(1,1);
 
     if (_wc > 0) {
         NVMatrixTernaryOps::WeightedAdd wadd = NVMatrixTernaryOps::WeightedAdd(_mom, gradScale, -_wc * _lrs->getValue(progress));
-        _weightsInc->applyTernary(wadd, *gradShards[getReplicaID()], *wShards[getReplicaID()], *_weightsInc);
+        _weightsInc->applyTernary(wadd, *grads, *wShards[getReplicaID()], *_weightsInc);
     } else {
-        // Original code
-        //_weightsInc->add(*gradShards[getReplicaID()], _mom, gradScale);
-        //
-
-        // Compute squared gradients to use in RMSProp
-        NVMatrix* squared_grads = NULL;
-        gradShards[getReplicaID()]->apply(NVMatrixOps::Square(), *squared_grads);
-
-        // Update moving average which is used to scale gradient values
-        _weightsRMS->add(*squared_grads, 0.9, 0.1);
-
-        // Take square root because in the RMSProp we divide by sqrt(moving_average) not by moving_average itself
-        NVMatrix sqrt_RMS;
-        _weightsRMS->apply(NVMatrixOps::Sqrt(), sqrt_RMS);
-
-        // Divide gradients by the sqrt(moving_average)
-        NVMatrix normalized_grad;
-        gradShards[getReplicaID()]->eltwiseDivide(sqrt_RMS, normalized_grad);
-
-        // Store final gradient update values
-        _weightsInc->add(normalized_grad, 0, gradScale);
-
+        // Weights change is previous weight change multiplied by momentum plus gradients multiplied by gradScale
+        _weightsInc->add(*grads, _mom, gradScale);
     }
 
     // Reduce everyone's gradient into my inc shard
