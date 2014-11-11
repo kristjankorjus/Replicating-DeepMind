@@ -175,6 +175,8 @@ class Main:
             if games_played % 100 == 0:
 
                 # Store state of the network as cpickle as Convnet does
+                self.nnet.batchnum = 1
+                self.nnet.epoch = 1
                 self.nnet.sync_with_host()
                 self.nnet.save_state()
             
