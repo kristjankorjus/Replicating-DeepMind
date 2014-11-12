@@ -112,14 +112,14 @@ class ALE:
 
         #: Write and send to ALE stuff
         self.fout.write(str(action)+",0\n")
-        print "sent action to ALE: ",  str(action)+",0"
+        #print "sent action to ALE: ",  str(action)+",0"
         self.fout.flush()
 
         #: Read from ALE
         line = self.fin.readline()
         try:
             self.next_image, episode_info = line[:-2].split(":")
-            print "got correct info from ALE: image + ", episode_info
+            #print "got correct info from ALE: image + ", episode_info
         except:
             print "got an error in reading stuff from ALE"
             traceback.print_exc()

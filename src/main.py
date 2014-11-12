@@ -130,7 +130,7 @@ class Main:
 
             # Start a new game
             self.ale.new_game()
-            print "starting game", games_played+1, "frames played so far:", frames_played
+            print "Starting a new game", games_played+1, "frames played so far:", frames_played
             game_score = 0
             self.nnet.epoch = games_played
 
