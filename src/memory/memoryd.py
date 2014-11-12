@@ -95,13 +95,14 @@ class MemoryD:
             while (i > (self.count % self.size) and (i-(self.count % self.size)) < 4) or self.actions[i] == 100:
                 i = random.randint(0, np.min([self.count, self.size]) - 1)
 
-            if self.actions[i] != 100:  # if not endstate
+            # add a state into the batch unless it is an endstate
+            if self.actions[i] != 100:
                 prestates[:, j] = self.get_state(i)
                 actions[j] = self.actions[i]
                 rewards[j] = self.rewards[i]
                 poststates[:, j] = self.get_state(i + 1)
                 j += 1
-            else: #this else clause was missing!
+            else:
                 print "We have a problem!! We selected an endstate!"
 
         return [prestates, actions, rewards, poststates]

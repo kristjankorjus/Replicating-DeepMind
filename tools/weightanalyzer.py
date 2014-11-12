@@ -8,7 +8,7 @@ import cPickle
 import numpy as np
 
 
-class Analyzer:
+class WeightAnalyzer:
 
     def __init__(self, filename):
 
@@ -23,5 +23,5 @@ class Analyzer:
 
 
 if __name__ == "__main__":
-    analyzer = Analyzer("weights_at_5700_games.pkl")
+    analyzer = WeightAnalyzer("data/weights_at_5700_games.pkl")
     analyzer.sandbox()
