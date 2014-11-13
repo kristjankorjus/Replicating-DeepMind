@@ -618,7 +618,7 @@ void ConvNetThread::initLayer(PyObject* paramsDict, int replicaID) {
     std::string type = pyDictGetString(paramsDict, "type");
     std::string name = pyDictGetString(paramsDict, "name");
     if (type == "fc") {
-        _nameLayerMap[name] = new FCLayer(this, paramsDict, replicaID, false);
+        _nameLayerMap[name] = new FCLayer(this, paramsDict, replicaID, true);
     } else if (type == "sfc") {
         _nameLayerMap[name] = new SplitFCLayer(this, paramsDict, replicaID, false);
     } else if (type == "conv") {
