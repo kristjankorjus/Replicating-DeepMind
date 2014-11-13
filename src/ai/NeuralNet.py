@@ -1,6 +1,6 @@
 """
 
-NeuralNet class creates a Q-learining network by binding together different neural network layers
+NeuralNet class creates a neural network.
 
 """
 
@@ -9,94 +9,85 @@ import numpy as np
 import time
 
 
-class DeepmindDataProvider:
+class SimpleDataProvider:
+    dims = None
+
     def __init__(self, data_dir, batch_range=None, init_epoch=1, init_batchnum=None, dp_params=None, test=False):
         pass
 
     def get_data_dims(self, idx=0):
-        # TODO: these numbers shouldn't be hardcoded
-        if idx == 0:
-            return 4*84*84
-        if idx == 1:
-            return 4
-        return 1
+        assert self.dims is not None
+        assert idx >= 0 and idx < len(self.dims)
+        return self.dims[idx]
 
 
 class NeuralNet(ConvNet):
 
-    def __init__(self, output_layer_name='layer4', discount_factor=0.9):
+    def __init__(self, nr_inputs, nr_outputs, layers_file, params_file, output_layer_name):
         """
         Initialize a NeuralNet
 
-        @param output_layer_name: name of the output (actions) layer
-        @param discount_factor: discount factor for future rewards
+        @param nr_inputs: number of inputs in data layer
+        @param nr_outputs: number of target values in another data layer
+        @param layers_file: path to layers file
+        @param params_file: path to params file
+        @param output_layer_name: name of the output layer
         """
+
+        # Save data parameters
+        self.nr_inputs = nr_inputs
+        self.nr_outputs = nr_outputs
+        SimpleDataProvider.dims = (nr_inputs, nr_outputs)
+
+        # Save layer parameters
+        self.layers_file = layers_file
+        self.params_file = params_file
+        self.output_layer_name = output_layer_name
+        
         # Initialise ConvNet, including self.libmodel
         op = NeuralNet.get_options_parser()
         op, load_dic = IGPUModel.parse_options(op)
         ConvNet.__init__(self, op, load_dic)
 
-        # Remember parameters and some useful variables
-        self.discount = discount_factor
-        self.output_layer_name = output_layer_name
-        self.num_outputs = self.layers[output_layer_name]['outputs']
-        self.output_file = open("../log/Q_history"+time.strftime("%Y-%m-%d-%H-%M")+".csv","w")
-
-    def train(self, minibatch):
+    def train(self, inputs, outputs):
         """
-        Train function that transforms (state,action,reward,state) into (input, expected_output) for neural net
-        and trains the network
-        @param minibatch: list of arrays: prestates, actions, rewards, poststates
-        """
-        
-        states = minibatch[0]
-        actions = minibatch[1]
-        rewards = minibatch[2]
-        next_states = minibatch[3]
+        Train neural net with inputs and outputs.
 
-        # predict scores for poststates
-        next_scores = self.predict(next_states)
-        # take maximum score of all actions
-        max_scores = np.max(next_scores, axis=1)
-        # predict scores for prestates, so we can keep scores for other actions unchanged
-        scores = self.predict(states)
-        # update the Q-values for the actions we actually performed
-        for i, action in enumerate(actions):
-            scores[i][action]= rewards[i] + self.discount * max_scores[i]
-        
+        @param inputs: NxM numpy.ndarray, where N is number of inputs and M is batch size
+        @param outputs: KxM numpy.ndarray, where K is number of outputs and M is batch size
+        @return cost?
+        """
+
+        assert inputs.shape[0] == self.nr_inputs
+        assert outputs.shape[0] == self.nr_outputs
+        assert inputs.shape[1] == outputs.shape[1]
+
         # start training in GPU
-        self.libmodel.startBatch([states, scores.transpose().copy()], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
+        self.libmodel.startBatch([inputs, outputs], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
         # wait until processing has finished
         cost = self.libmodel.finishBatch()
         # return cost (error)
         return cost
 
-    def predict(self, states):
+    def predict(self, inputs):
         """
-        Predict returns neural network output layer activations for input
-        @param states: numpy.ndarray of states
+        Predict neural network output layer activations for input.
+
+        @param inputs: NxM numpy.ndarray, where N is number of inputs and M is batch size
         """
-        batch_size = np.shape(states)[1]
-        scores = np.zeros((batch_size, self.num_outputs), dtype=np.float32)
+        assert inputs.shape[0] == self.nr_inputs
+
+        batch_size = inputs.shape[1]
+        outputs = np.zeros((batch_size, self.nr_outputs), dtype=np.float32)
 
         # start feed-forward pass in GPU
-        self.libmodel.startFeatureWriter([states, scores.transpose().copy()], [scores], [self.output_layer_name])
+        self.libmodel.startFeatureWriter([inputs, outputs.transpose().copy()], [outputs], [self.output_layer_name])
         # wait until processing has finished
         self.libmodel.finishBatch()
 
-        # now activations of output layer should be in 'scores'
-        return scores
+        # now activations of output layer should be in 'outputs'
+        return outputs
 
-    def predict_best_action(self, last_state):
-        # last_state contains only one state, so we have to convert it into batch of size 1
-        states = np.reshape(last_state, (len(last_state), 1))
-        scores = self.predict(states)
-        #print "the predicted q-values are: ", scores
-        self.output_file.write(str(scores).strip().replace(' ', ',')[2:-2] + '\n')
-        self.output_file.flush()
-        return np.argmax(scores)
-
-    #remove options we do not need
     @classmethod
     def get_options_parser(cls):
         op = ConvNet.get_options_parser()
@@ -110,8 +101,11 @@ class NeuralNet(ConvNet):
         op.options["data_path"].default="/storage/hpc_kristjan/cuda-convnet4" # TODO: remove this
         op.options["layer_def"].default="ai/deepmind-layers.cfg"
         op.options["layer_params"].default="ai/deepmind-params.cfg"
-        #op.options["save_path"].default="/storage/hpc_kristjan/DeepMind"
-        op.options["dp_type"].default="deepmind"
-        DataProvider.register_data_provider('deepmind', 'DeepMind data provider', DeepmindDataProvider)
+        #op.options["save_path"].default="."
+        #op.options["gpu"].default="0"
+        op.options["dp_type"].default="simple"
+	op.options["minibatch_size"].default=32
+ 
+        DataProvider.register_data_provider('simple', 'Simple data provider', SimpleDataProvider)
 
         return op

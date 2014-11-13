@@ -645,7 +645,7 @@ void Matrix::print(int64 rows, int64 cols) const {
 void Matrix::print(int64 startRow, int64 rows, int64 startCol, int64 cols) const {
     for (int64 i = startRow; i < std::min(startRow+rows, this->_numRows); i++) {
         for (int64 j = startCol; j < std::min(startCol+cols, this->_numCols); j++) {
-            printf("%.15f ", (*this)(i, j));
+            printf("%.20f ", (*this)(i, j));
         }
         printf("\n");
     }

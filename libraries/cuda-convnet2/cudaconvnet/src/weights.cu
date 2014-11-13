@@ -117,6 +117,8 @@ void Weights::init(Matrix& hWeights, Matrix& hWeightsInc, ParameterSchedule& lrs
     _srcWeights = NULL;
     _hWeights = &hWeights;
     _hWeightsInc = &hWeightsInc;
+    _hWeightsRMS = new Matrix(_hWeights->getNumRows(), _hWeights->getNumCols());
+    _hWeightsRMS->apply(Matrix::ZERO);
     _numUpdates = 0;
     _lrs = &lrs;
     _parent = &parent;
@@ -129,6 +131,7 @@ void Weights::init(Matrix& hWeights, Matrix& hWeightsInc, ParameterSchedule& lrs
     _weightsInc = NULL;
     //printf("##########weightsinc is initialized to NULL \n");
     _weightsGrad = NULL;
+    _weightsRMS = NULL;
     _cleanup = cleanup;
     _reducer = NULL;
     _broadcaster = NULL;
@@ -141,10 +144,12 @@ Weights::~Weights() {
     if (_cleanup) {
         delete _hWeights;
         delete _hWeightsInc;
+        delete _hWeightsRMS;
         if (_srcWeights == NULL) {
             delete _weights;
             delete _weightsInc;
             delete _weightsGrad;
+            delete _weightsRMS;
         }
     }
 }
@@ -241,9 +246,12 @@ void Weights::copyToCPU() {
             _weightsInc->copyToHost(hIncShard);
 	    //printf("###############copytohost usgrad true\n");
             delete &hIncShard;
+            Matrix& hRMSShard = getShard(*_hWeightsRMS);
+            _weightsRMS->copyToHost(hRMSShard);
+            delete &hRMSShard;
         } else { // In this case there's definitely only one replica
             _weightsInc->copyToHost(*_hWeightsInc);
-	    //printf("###########copytohost usegrad=false\n ");
+            _weightsRMS->copyToHost(*_hWeightsRMS);
         }
     }
 }
@@ -256,7 +264,7 @@ void Weights::copyToGPU() {
     if (_srcWeights == NULL) {
         _weights = _weights == NULL ? new NVMatrix() : _weights;
         _weightsInc = _weightsInc == NULL ? new NVMatrix() : _weightsInc;
-	//printf("##########weightsinc is initialized or sth l255\n");
+        _weightsRMS = _weightsRMS == NULL ? new NVMatrix() : _weightsRMS;
         _weights->copyFromHost(*_hWeights, true);
 
         if (_useGrad) {
@@ -266,16 +274,19 @@ void Weights::copyToGPU() {
             _weightsInc->copyFromHost(hIncShard, true);
 	    //printf("###########copy from host, usegrad=true \n");
             delete &hIncShard;
+            Matrix& hRMSShard = getShard(*_hWeightsRMS);
+            _weightsRMS->copyFromHost(hRMSShard, true);
+            delete &hRMSShard;
         } else {
             _weightsInc->copyFromHost(*_hWeightsInc, true);
-	    //printf("copy from host, usegrad=false \n");
+            _weightsRMS->copyFromHost(*_hWeightsRMS, true);
         }
 
         _weightsGrad = _useGrad ? (_weightsGrad == NULL ? new NVMatrix(*_weights) : _weightsGrad) : NULL;
     } else {
         _weights = _srcWeights->_weights;
         _weightsInc = _srcWeights->_weightsInc;
-	//printf("###########weightinc was given value by srcweights l271\n");
+        _weightsRMS = _srcWeights->_weightsRMS;
         _weightsGrad = _srcWeights->_weightsGrad;
     }
     _onGPU = true;
@@ -285,6 +296,7 @@ void Weights::aggregateReplicaGradients(float progress) {
     //printf("aggregateReplGrad, replica ID %d\n", getReplicaID());
     map<int, NVMatrix*> gradShards;
     map<int, NVMatrix*> wShards;
+    //printf("%s: aggregateReplicaGradients(%f) ver12\n", _parent->getName().c_str(), progress);
     for (map<int,Weights*>::const_iterator it = _replicas.begin(); it != _replicas.end(); ++it) {
         gradShards[it->first] = &getShard(it->second->getGrad(), getReplicaID());
         wShards[it->first] = &getShard(it->second->getW(), getReplicaID());
@@ -292,16 +304,33 @@ void Weights::aggregateReplicaGradients(float progress) {
     }
 
     float gradScale = _lrs->getValue(progress);
+    float gamma = 0.9;
+    float epsilon = 1E-12;
     NVMatrix::setDeviceID(getDeviceID());
-    //printf("###########aggregateReplGrad, repl ID a bit later is %d\n", getReplicaID());    
+
+    NVMatrix *grads = gradShards[getReplicaID()];
+    //printf("%s: grads before: ", _parent->getName().c_str()); grads->print(1,1);
+    //printf("%s: _weightsRMS before: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+    // Add squared gradient to weightsRMS, width gradient weighted by 1-gamma and previous weightsRMS weighted by gamma
+    _weightsRMS->applyBinary(NVMatrixBinaryOps::CompositeSecond<NVMatrixOps::Square, NVMatrixBinaryOps::WeightedAdd>
+        (NVMatrixOps::Square(), NVMatrixBinaryOps::WeightedAdd(gamma, 1 - gamma)), *grads);
+    //printf("%s: _weightsRMS before epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+    // Add epsilon to _weightsRMS before dividing, so it is never 0
+    _weightsRMS->addScalar(epsilon);
+    // Divide gradient by squared root of mean squared gradients
+    grads->applyBinary(NVMatrixBinaryOps::CompositeSecond<NVMatrixOps::Sqrt, NVMatrixBinaryOps::Divide>
+        (NVMatrixOps::Sqrt(), NVMatrixBinaryOps::Divide()), *_weightsRMS);
+    // Undo epsilon
+    _weightsRMS->addScalar(-epsilon);
+    //printf("%s: _weightsRMS after epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+    //printf("%s: grads after: ", _parent->getName().c_str()); grads->print(1,1);
 
     if (_wc > 0) {
         NVMatrixTernaryOps::WeightedAdd wadd = NVMatrixTernaryOps::WeightedAdd(_mom, gradScale, -_wc * _lrs->getValue(progress));
-        _weightsInc->applyTernary(wadd, *gradShards[getReplicaID()], *wShards[getReplicaID()], *_weightsInc);
-	//printf("#####aggrRG wc>0, ternary op \n");
+        _weightsInc->applyTernary(wadd, *grads, *wShards[getReplicaID()], *_weightsInc);
     } else {
-        _weightsInc->add(*gradShards[getReplicaID()], _mom, gradScale);
-	//printf("#####aggrRG changedweightsinc \n");
+        // Weights change is previous weight change multiplied by momentum plus gradients multiplied by gradScale
+        _weightsInc->add(*grads, _mom, gradScale);
     }
 
     // Reduce everyone's gradient into my inc shard
@@ -335,7 +364,7 @@ void Weights::aggregateReplicaGradients(float progress) {
 // The scaling by epsW will be done in this routine.
 void Weights::update(float progress) {
     // Only true owner of weights updates
-    //printf("weights.cu: %s updating weights \n", _parent->getName().c_str());
+//    printf("%s update weights\n", _parent->getName().c_str());
     if (_srcWeights == NULL && _lrs->getBaseValue() > 0) {
         //printf("weights.cu: progress %f, grad %d\n", progress, _useGrad);
         assert(_onGPU);
@@ -346,9 +375,6 @@ void Weights::update(float progress) {
                 _weightsInc->add(*_weights, -_wc * _lrs->getValue(progress));
             }
             _weights->add(*_weightsInc);
-	    _weightsInc->print(5,5);
-	    //printf("++++++++++++++++++We added weightsinc to weights, never did aggrReplica \n");
-	    //assert(1==2);
         }
         _numUpdates = 0;
     }
