@@ -697,6 +697,8 @@ std::string& NeuronLayer::getNeuronType() {
  */
 WeightLayer::WeightLayer(ConvNetThread* convNetThread, PyObject* paramsDict, int replicaID, bool trans, bool useGrad) :
     Layer(convNetThread, paramsDict, replicaID, trans) {
+
+    printf("weight layer name %s created, usegrad is %d \n", _name.c_str(), useGrad);
     _weightUpdatePassPeriod = pyDictGetInt(paramsDict, "updatePeriod");
 
     MatrixV& hWeights = *pyDictGetMatrixV(paramsDict, "weights");
@@ -798,8 +800,11 @@ void WeightLayer::bpropCommon(NVMatrix& v, int replicaIdx, PASS_TYPE passType) {
 }
 
 bool WeightLayer::updateWeights() {
+     //printf("weight %s updating weights\n", _name.c_str());
      if (getConvNet().getTotalPassesDone() % _weightUpdatePassPeriod == 0) {
+     	//printf("layers.cu: updateWeights(): weights->update\n");
         _weights->update(getConvNet().getTrainingProgress());
+	//printf("layers.cu:updateWeights(): biases->update\n");
         _biases->update(getConvNet().getTrainingProgress());
 //        constrainWeights();
         return true;
@@ -808,6 +813,7 @@ bool WeightLayer::updateWeights() {
 }
 
 bool WeightLayer::constrainWeights() {
+    //printf("Weight layer %s constrain weights v.2\n", _name.c_str());
     if (getConvNet().getTotalPassesDone() % _weightUpdatePassPeriod == 0) {
         _constrainWeights();
         return true;
@@ -891,6 +897,7 @@ NVMatrix& WeightLayer::getBiasMatrix(PASS_TYPE passType) {
  */
 FCLayer::FCLayer(ConvNetThread* convNetThread, PyObject* paramsDict, int replicaID, bool useGrad)
     : WeightLayer(convNetThread, paramsDict, replicaID, true, useGrad) {
+    printf("FC layer constructor, usegrad is %x\n", useGrad);
     _wStep = 0.01;
     _bStep = 0.01;
 }
@@ -913,6 +920,7 @@ void FCLayer::bpropBiases(NVMatrix& v, PASS_TYPE passType) {
 }
 
 void FCLayer::bpropWeights(NVMatrix& v, int replicaIdx, int inpIdx, PASS_TYPE passType) {
+    //printf("FCLayer::bpropWeights : PT %d, inpIDX %d \n", passType, inpIdx);
     NVMatrix& prevActs_T = _inputs[inpIdx]->getTranspose();
     float scaleGrad = getGradScale(inpIdx, passType);
     float scaleInc = getIncScale(inpIdx, passType);
@@ -939,6 +947,7 @@ void FCLayer::_constrainWeights() {
  */
 SplitFCLayer::SplitFCLayer(ConvNetThread* convNetThread, PyObject* paramsDict, int replicaID, bool useGrad)
     : FCLayer(convNetThread, paramsDict, replicaID, useGrad) {
+    printf("splitFClayer consturctor, usegrad is %x\n", useGrad);
     _numParts = pyDictGetInt(paramsDict, "parts");
 }
 
@@ -1006,6 +1015,7 @@ TwoDLayerInterface::TwoDLayerInterface(PyObject* paramsDict) {
  */
 LocalLayer::LocalLayer(ConvNetThread* convNetThread, PyObject* paramsDict, int replicaID, bool useGrad)
     : WeightLayer(convNetThread, paramsDict, replicaID, false, useGrad) {
+    printf("LocalLayer constructor, usegrad is %x\n", useGrad);
     _padding = pyDictGetIntV(paramsDict, "padding");
     _stride = pyDictGetIntV(paramsDict, "stride");
     _filterSize = pyDictGetIntV(paramsDict, "filterSize");
@@ -1040,6 +1050,7 @@ LocalLayer::~LocalLayer() {
  */
 ConvLayer::ConvLayer(ConvNetThread* convNetThread, PyObject* paramsDict, int replicaID)
     : LocalLayer(convNetThread, paramsDict, replicaID, true) {
+    printf("convLayer constructor has no param useGrad, seems its always set to true \n");
     _sumWidth = pyDictGetInt(paramsDict, "sumWidth");
     _sharedBiases = pyDictGetInt(paramsDict, "sharedBiases");
     _weightContrastNormMin = pyDictGetFloatV(paramsDict, "wcNormMin");
