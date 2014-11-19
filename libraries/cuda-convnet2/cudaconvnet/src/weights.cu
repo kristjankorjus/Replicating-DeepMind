@@ -346,7 +346,7 @@ void Weights::aggregateReplicaGradients(float progress) {
         (NVMatrixOps::Sqrt(), NVMatrixBinaryOps::Divide()), *_weightsRMS);
 
     // Undo epsilon
-    //_weightsRMS->addScalar(-epsilon);
+    _weightsRMS->addScalar(-epsilon);
     //printf("%s: _weightsRMS after epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
     //printf("%s: grads after: ", _parent->getName().c_str()); grads->print(1,1);
 
