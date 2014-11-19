@@ -6,7 +6,6 @@ Preprocessor takes images from ALE and turns them into cropped, downscaled array
 
 from PIL import Image
 import numpy as np
-import sys
 
 class Preprocessor:
 
