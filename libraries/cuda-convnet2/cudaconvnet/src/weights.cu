@@ -307,17 +307,21 @@ void Weights::aggregateReplicaGradients(float progress) {
     NVMatrix *grads = gradShards[getReplicaID()];
     //printf("%s: grads before: ", _parent->getName().c_str()); grads->print(1,1);
     //printf("%s: _weightsRMS before: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+
     // Add squared gradient to weightsRMS, width gradient weighted by 1-gamma and previous weightsRMS weighted by gamma
     _weightsRMS->applyBinary(NVMatrixBinaryOps::CompositeSecond<NVMatrixOps::Square, NVMatrixBinaryOps::WeightedAdd>
         (NVMatrixOps::Square(), NVMatrixBinaryOps::WeightedAdd(gamma, 1 - gamma)), *grads);
     //printf("%s: _weightsRMS before epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
+
     // Add epsilon to _weightsRMS before dividing, so it is never 0
     _weightsRMS->addScalar(epsilon);
+
     // Divide gradient by squared root of mean squared gradients
     grads->applyBinary(NVMatrixBinaryOps::CompositeSecond<NVMatrixOps::Sqrt, NVMatrixBinaryOps::Divide>
         (NVMatrixOps::Sqrt(), NVMatrixBinaryOps::Divide()), *_weightsRMS);
+
     // Undo epsilon
-    _weightsRMS->addScalar(-epsilon);
+    //_weightsRMS->addScalar(-epsilon);
     //printf("%s: _weightsRMS after epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
     //printf("%s: grads after: ", _parent->getName().c_str()); grads->print(1,1);
 
@@ -360,7 +364,8 @@ void Weights::aggregateReplicaGradients(float progress) {
 // The scaling by epsW will be done in this routine.
 void Weights::update(float progress) {
     // Only true owner of weights updates
-//    printf("%s update weights\n", _parent->getName().c_str());
+    //printf("%s update weights, _useGrad = %d v3\n", _parent->getName().c_str(), _useGrad);
+	assert(_srcWeights == NULL);
     if (_srcWeights == NULL && _lrs->getBaseValue() > 0) {
         assert(_onGPU);
         if (_useGrad) {

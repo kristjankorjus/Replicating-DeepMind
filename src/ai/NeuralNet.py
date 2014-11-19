@@ -104,6 +104,7 @@ class NeuralNet(ConvNet):
         #op.options["save_path"].default="."
         #op.options["gpu"].default="0"
         op.options["dp_type"].default="simple"
+        op.options["minibatch_size"].default = 32
  
         DataProvider.register_data_provider('simple', 'Simple data provider', SimpleDataProvider)
 
