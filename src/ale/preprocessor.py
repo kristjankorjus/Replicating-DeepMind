@@ -6,7 +6,7 @@ Preprocessor takes images from ALE and turns them into cropped, downscaled array
 
 from PIL import Image
 import numpy as np
-
+import sys
 
 class Preprocessor:
 
@@ -38,7 +38,7 @@ class Preprocessor:
         # Turn the array into an image object and downscale
         img = Image.fromarray(grays.reshape((160, 160)))
         new_size = self.desired_image_size, self.desired_image_size
-        img.thumbnail(new_size)
+        img.thumbnail(new_size, Image.NEAREST)
 
         # Get pixel data again
         norm_pixels = np.asarray(img, dtype=np.float32) / 256.0
