@@ -85,20 +85,25 @@ class MemoryD:
         actions = np.empty((size), dtype=np.float32)
         rewards = np.empty((size), dtype=np.float32)
         poststates = np.empty((84 * 84 * 4, size), dtype = np.float32)
+
         #: Pick random n indices and save dictionary if not terminal state
         j = 0
         while j < size:
             i = random.randint(0, np.min([self.count, self.size]) - 1)
+
             # we don't want to take frames that are just after our rewrite point
-            while i > (self.count % self.size) and (i-(self.count % self.size)) < 4:
+            while (i > (self.count % self.size) and (i-(self.count % self.size)) < 4) or self.actions[i] == 100:
                 i = random.randint(0, np.min([self.count, self.size]) - 1)
 
-            if self.actions[i] != 100:  # if not endstate
+            # add a state into the batch unless it is an endstate
+            if self.actions[i] != 100:
                 prestates[:, j] = self.get_state(i)
                 actions[j] = self.actions[i]
                 rewards[j] = self.rewards[i]
                 poststates[:, j] = self.get_state(i + 1)
                 j += 1
+            else:
+                print "We have a problem!! We selected an endstate!"
 
         return [prestates, actions, rewards, poststates]
 
