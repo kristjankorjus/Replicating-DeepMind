@@ -334,7 +334,7 @@ void Weights::aggregateReplicaGradients(float progress) {
     //printf("%s: grads after: ", _parent->getName().c_str()); grads->print(1,1);
 
     if (_wc > 0) {
-        NVMatrixTernaryOps::WeightedAdd wadd = NVMatrixTernaryOps::WeightedAdd(_mom * _mom, (1 + _mom) * gradScale, -_wc * _lrs->getValue(progress));
+        NVMatrixTernaryOps::WeightedAdd wadd = NVMatrixTernaryOps::WeightedAdd(_mom, gradScale, -_wc * _lrs->getValue(progress));
         _weightsInc->applyTernary(wadd, *grads, *wShards[getReplicaID()], *_weightsInc);
     } else {
         // Weights change is previous weight change multiplied by momentum squared plus gradients multiplied by gradScale * (1 + momentum)
