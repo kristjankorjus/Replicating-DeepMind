@@ -119,8 +119,6 @@ void Weights::init(Matrix& hWeights, Matrix& hWeightsInc, ParameterSchedule& lrs
     _hWeightsInc = &hWeightsInc;
     _hWeightsRMS = new Matrix(_hWeights->getNumRows(), _hWeights->getNumCols());
     _hWeightsRMS->apply(Matrix::ZERO);
-    _hWeights_V = new Matrix(_hWeights->getNumRows(), _hWeights->getNumCols());
-    _hWeights_V->apply(Matrix::ZERO);
     _numUpdates = 0;
     _lrs = &lrs;
     _parent = &parent;
@@ -134,7 +132,6 @@ void Weights::init(Matrix& hWeights, Matrix& hWeightsInc, ParameterSchedule& lrs
     //printf("##########weightsinc is initialized to NULL \n");
     _weightsGrad = NULL;
     _weightsRMS = NULL;
-    _weights_V = NULL;
     _cleanup = cleanup;
     _reducer = NULL;
     _broadcaster = NULL;
@@ -148,13 +145,11 @@ Weights::~Weights() {
         delete _hWeights;
         delete _hWeightsInc;
         delete _hWeightsRMS;
-        delete _hWeights_V;
         if (_srcWeights == NULL) {
             delete _weights;
             delete _weightsInc;
             delete _weightsGrad;
             delete _weightsRMS;
-            delete _weights_V;
         }
     }
 }
@@ -255,14 +250,9 @@ void Weights::copyToCPU() {
             Matrix& hRMSShard = getShard(*_hWeightsRMS);
             _weightsRMS->copyToHost(hRMSShard);
             delete &hRMSShard;
-
-            Matrix& h_V_Shard = getShard(*_hWeights_V);
-            _weights_V->copyToHost(h_V_Shard);
-            delete &h_V_Shard;
         } else { // In this case there's definitely only one replica
             _weightsInc->copyToHost(*_hWeightsInc);
             _weightsRMS->copyToHost(*_hWeightsRMS);
-            _weights_V->copyToHost(*_hWeights_V);
         }
     }
 }
@@ -276,7 +266,6 @@ void Weights::copyToGPU() {
         _weights = _weights == NULL ? new NVMatrix() : _weights;
         _weightsInc = _weightsInc == NULL ? new NVMatrix() : _weightsInc;
         _weightsRMS = _weightsRMS == NULL ? new NVMatrix() : _weightsRMS;
-        _weights_V = _weights_V == NULL ? new NVMatrix() : _weights_V;
 
         _weights->copyFromHost(*_hWeights, true);
 
@@ -291,15 +280,9 @@ void Weights::copyToGPU() {
             Matrix& hRMSShard = getShard(*_hWeightsRMS);
             _weightsRMS->copyFromHost(hRMSShard, true);
             delete &hRMSShard;
-
-            Matrix& h_V_Shard = getShard(*_hWeights_V);
-            _weights_V->copyFromHost(h_V_Shard, true);
-            delete &h_V_Shard;
-
         } else {
             _weightsInc->copyFromHost(*_hWeightsInc, true);
             _weightsRMS->copyFromHost(*_hWeightsRMS, true);
-            _weights_V->copyFromHost(*_hWeights_V, true);
         }
 
         _weightsGrad = _useGrad ? (_weightsGrad == NULL ? new NVMatrix(*_weights) : _weightsGrad) : NULL;
@@ -307,7 +290,6 @@ void Weights::copyToGPU() {
         _weights = _srcWeights->_weights;
         _weightsInc = _srcWeights->_weightsInc;
         _weightsRMS = _srcWeights->_weightsRMS;
-        _weights_V = _srcWeights->_weights_V;
         _weightsGrad = _srcWeights->_weightsGrad;
     }
     _onGPU = true;
@@ -347,22 +329,17 @@ void Weights::aggregateReplicaGradients(float progress) {
 
     // Undo epsilon
     //_weightsRMS->addScalar(-epsilon);
+
     //printf("%s: _weightsRMS after epsilon: ", _parent->getName().c_str()); _weightsRMS->print(1,1);
     //printf("%s: grads after: ", _parent->getName().c_str()); grads->print(1,1);
-
-    // this is the intermediary step for implementing Nesterov momentum (formula nr (6) in boulanni's comment in https://github.com/lisa-lab/pylearn2/pull/136)
-    _weights_V->add(*grads, _mom, gradScale);
 
     if (_wc > 0) {
         NVMatrixTernaryOps::WeightedAdd wadd = NVMatrixTernaryOps::WeightedAdd(_mom, gradScale, -_wc * _lrs->getValue(progress));
         _weightsInc->applyTernary(wadd, *grads, *wShards[getReplicaID()], *_weightsInc);
     } else {
-        // Weights change is previous weight change multiplied by momentum plus gradients multiplied by gradScale
-        //_weightsInc->add(*grads, _mom, gradScale);
-        _weights_V->add(*grads, _mom, gradScale, *_weightsInc);
-        //_weightsInc->add(*grads, 0, gradScale);
-        //_weightsInc->add(_weights_V, 1, _mom);
-
+        // Weights change is previous weight change multiplied by momentum squared plus gradients multiplied by gradScale * (1 + momentum)
+        // We are applying simplified Nesterov momentum per section 3.5 of http://arxiv.org/pdf/1212.0901.pdf
+        _weightsInc->add(*grads, _mom * _mom, (1 + _mom) * gradScale);
     }
 
     // Reduce everyone's gradient into my inc shard
