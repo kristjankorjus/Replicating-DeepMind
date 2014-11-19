@@ -41,8 +41,8 @@ class Preprocessor:
         img.thumbnail(new_size)
 
         # Get pixel data again
-        raw_pixels = np.asarray(img, dtype=np.uint8)
-        return raw_pixels
+        norm_pixels = np.asarray(img, dtype=np.float32) / 256.0
+        return norm_pixels
 
     def get_grayscale_array(self):
         """
