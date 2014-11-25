@@ -45,7 +45,10 @@ def NTSC_To_Grayscale():
     #f.write(txt)
     #f.close()
 
-    Grayscale=0.21*Rs+0.71*Gs+0.07*Bs #based on luminoscity
+    Grayscale= (Rs+Gs+Bs)/3.0
+    #Grayscale=0.21*Rs+0.71*Gs+0.07*Bs #based on luminoscity
+
+
     #print 0.21*Rs
     #print 0.71*Gs
     #print 0.07*Gs
@@ -54,7 +57,8 @@ def NTSC_To_Grayscale():
     #print np.shape(Bs)
     #print np.shape(Gs)
     #print np.shape(Grayscale)
-    np.savetxt("Grayscale.dat", Grayscale)  #saves the matrix into a file
+    print Grayscale
+    np.savetxt("Grayscale_simple.dat", Grayscale)  #saves the matrix into a file
     #np.savetxt("R.dat", Rs)
     return Grayscale
 
@@ -63,7 +67,7 @@ def NTSC_To_Grayscale():
 
 matr1=NTSC_To_Grayscale() #you can either take the returned grayscale matrix
 #or read it from the file where it was saved
-matr=np.loadtxt("Grayscale.dat") #this is how you can read the saved file
+matr=np.loadtxt("Grayscale_simple.dat") #this is how you can read the saved file
 #print matr
 #print matr1
 #print matr1==matr
