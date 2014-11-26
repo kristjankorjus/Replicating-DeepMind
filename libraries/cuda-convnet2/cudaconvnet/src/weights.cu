@@ -16,6 +16,7 @@
 
 #include <map>
 #include <algorithm>
+#include <cfloat>
 #include "../include/weights.cuh"
 #include "../include/lr.cuh"
 #include "../include/worker.cuh"
@@ -326,7 +327,7 @@ void Weights::aggregateReplicaGradients(float progress) {
 
     float gradScale = _lrs->getValue(progress);
     float gamma = 0.9;
-    float epsilon = 1E-12;
+    float epsilon = FLT_EPSILON;
     NVMatrix::setDeviceID(getDeviceID());
 
     NVMatrix *grads = gradShards[getReplicaID()];
@@ -355,14 +356,10 @@ void Weights::aggregateReplicaGradients(float progress) {
 
     if (_wc > 0) {
         NVMatrixTernaryOps::WeightedAdd wadd = NVMatrixTernaryOps::WeightedAdd(_mom, gradScale, -_wc * _lrs->getValue(progress));
-        _weightsInc->applyTernary(wadd, *grads, *wShards[getReplicaID()], *_weightsInc);
+        _weights_V->applyTernary(wadd, *grads, *wShards[getReplicaID()], *_weightsInc);
     } else {
-        // Weights change is previous weight change multiplied by momentum plus gradients multiplied by gradScale
-        //_weightsInc->add(*grads, _mom, gradScale);
+        // Weights change is velocity multiplied by momentum plus gradients multiplied by gradScale
         _weights_V->add(*grads, _mom, gradScale, *_weightsInc);
-        //_weightsInc->add(*grads, 0, gradScale);
-        //_weightsInc->add(_weights_V, 1, _mom);
-
     }
 
     // Reduce everyone's gradient into my inc shard
