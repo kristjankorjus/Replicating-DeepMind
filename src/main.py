@@ -147,11 +147,10 @@ class Main:
                 #print "Neural net chose action %d" % int(action)
 
             # Make the move
-            reward = self.ale.move(action)
-            if reward:
-                reward = 1
-                print "    Got reward of %d" % reward
-            game_score += reward
+            points = self.ale.move(action)
+            if points > 0:
+                print "    Got %d points" % points
+            game_score += points
             frames_played += 1
             #print "Played frame %d" % frames_played
 
@@ -224,6 +223,10 @@ class Main:
                 wdata.extend([str(w[0]), str(w[1]), str(w[1] / w[0] if w[0] > 0 else 0)])
             log_weights.write(','.join(wdata) + NL)
             log_weights.flush()
+
+            # save network state
+            self.nnet.save_network(epoch)
+            print   # save_network()'s output doesn't include newline
 
             # play number of frames without training and without epsilon annealing
             print "  Testing for %d frames" % testing_frames

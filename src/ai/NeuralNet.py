@@ -100,6 +100,12 @@ class NeuralNet(ConvNet):
                     wscales[l['name'], 'weights' + str(i)] = (n.mean(n.abs(w)), n.mean(n.abs(wi)))
         return wscales
 
+    def save_network(self, epoch):
+        self.epoch = epoch
+        self.batchnum = 1
+        self.sync_with_host()
+        self.save_state().join()
+
     @classmethod
     def get_options_parser(cls):
         op = ConvNet.get_options_parser()
