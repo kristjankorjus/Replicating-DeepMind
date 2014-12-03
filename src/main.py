@@ -11,6 +11,7 @@ import random
 import numpy as np
 import time
 import sys
+from os import linesep as NL
 
 class Main:
     # How many transitions to keep in memory?
@@ -89,17 +90,27 @@ class Main:
 
         # predict Q-values for prestates, so we can keep Q-values for other actions unchanged
         qvalues = self.nnet.predict(prestates)
+        #print "Prestate q-values: ", qvalues[0,:]
+        #print "Action was: %d, reward was %d" % (actions[0], rewards[0])
+
         # predict Q-values for poststates
         post_qvalues = self.nnet.predict(poststates)
+        #print "Poststate q-values: ", post_qvalues[0,:]
+
         # take maximum Q-value of all actions
         max_qvalues = np.max(post_qvalues, axis = 1)
 
         # update the Q-values for the actions we actually performed
         for i, action in enumerate(actions):
             qvalues[i][action] = rewards[i] + self.discount_factor * max_qvalues[i]
+        #print "Corrected q-values: ", qvalues[0,:]
 
         # we have to transpose prediction result, as train expects input in opposite order
         cost = self.nnet.train(prestates, qvalues.transpose().copy())
+
+        #qvalues = self.nnet.predict(prestates)
+        #print "After training: ", qvalues[0,:]
+
         return cost
 
     def play_games(self, nr_frames, train, epsilon = None):
@@ -180,6 +191,7 @@ class Main:
         log_test.write("epoch,nr_games,sum_score,average_score,average_qvalue,nr_frames,epsilon,memory_size\n")
         log_train_scores = open("../log/training_scores_" + timestamp + ".txt", "w")
         log_test_scores = open("../log/testing_scores_" + timestamp + ".txt", "w")
+        log_weights = open("../log/weights_" + timestamp + ".csv", "w")
 
         for epoch in range(1, epochs + 1):
             print "Epoch %d:" % epoch
@@ -188,20 +200,37 @@ class Main:
             training_scores = self.play_games(training_frames, train = True)
 
             # log training scores
-            log_train_scores.write('\n'.join(map(str, training_scores)) + '\n')
+            log_train_scores.write(NL.join(map(str, training_scores)) + NL)
             log_train_scores.flush()
 
             # log aggregated training data
             train_data = (epoch, len(training_scores), sum(training_scores), np.mean(training_scores), training_frames, self.total_frames_trained, self.compute_epsilon(self.total_frames_trained), self.memory.count)
-            log_train.write(','.join(map(str, train_data)) + '\n')
+            log_train.write(','.join(map(str, train_data)) + NL)
             log_train.flush()
+
+            weights = self.nnet.get_weight_stats()
+            if epoch == 1:
+                # write header
+                wlayers = []
+                for (layer, index) in weights:
+                    wlayers.extend([layer, index, ''])
+                log_weights.write(','.join(wlayers) + NL)
+                wlabels = []
+                for (layer, index) in weights:
+                    wlabels.extend(['weights', 'weightsInc', 'incRatio'])
+                log_weights.write(','.join(wlabels) + NL)
+            wdata = []
+            for w in weights.itervalues():
+                wdata.extend([str(w[0]), str(w[1]), str(w[1] / w[0] if w[0] > 0 else 0)])
+            log_weights.write(','.join(wdata) + NL)
+            log_weights.flush()
 
             # play number of frames without training and without epsilon annealing
             print "  Testing for %d frames" % testing_frames
             testing_scores = self.play_games(testing_frames, train = False, epsilon = self.test_epsilon)
 
             # log testing scores
-            log_test_scores.write('\n'.join(map(str, testing_scores)) + '\n')
+            log_test_scores.write(NL.join(map(str, testing_scores)) + NL)
             log_test_scores.flush()
 
             # Pick random states to calculate Q-values for
@@ -220,11 +249,14 @@ class Main:
 
             # log aggregated testing data
             test_data = (epoch, len(testing_scores), sum(testing_scores), np.mean(testing_scores), avg_qvalue, testing_frames, self.test_epsilon, self.memory.count)
-            log_test.write(','.join(map(str, test_data)) + '\n')
+            log_test.write(','.join(map(str, test_data)) + NL)
             log_test.flush()
 
         log_train.close()
         log_test.close()
+        log_train_scores.close()
+        log_test_scores.close()
+        log_weights.close()
 
 if __name__ == '__main__':
     # ignore cuda-convnet options at start of command line

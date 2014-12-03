@@ -7,7 +7,7 @@ NeuralNet class creates a neural network.
 from convnet import *
 import numpy as np
 import time
-
+from collections import OrderedDict
 
 class SimpleDataProvider:
     dims = None
@@ -87,6 +87,18 @@ class NeuralNet(ConvNet):
 
         # now activations of output layer should be in 'outputs'
         return outputs
+
+    def get_weight_stats(self):
+        # copy weights from GPU to CPU memory
+        self.sync_with_host()
+        wscales = OrderedDict()
+        for name,val in sorted(self.layers.items(), key=lambda x: x[1]['id']): # This is kind of hacky but will do for now.
+            l = self.layers[name]
+            if 'weights' in l:
+                wscales[l['name'], 'biases'] = (n.mean(n.abs(l['biases'])), n.mean(n.abs(l['biasesInc'])))
+                for i,(w,wi) in enumerate(zip(l['weights'],l['weightsInc'])):
+                    wscales[l['name'], 'weights' + str(i)] = (n.mean(n.abs(w)), n.mean(n.abs(wi)))
+        return wscales
 
     @classmethod
     def get_options_parser(cls):
