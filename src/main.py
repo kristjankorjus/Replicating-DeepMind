@@ -194,66 +194,73 @@ class Main:
 
         for epoch in range(1, epochs + 1):
             print "Epoch %d:" % epoch
-            # play number of frames with training and epsilon annealing
-            print "  Training for %d frames" % training_frames
-            training_scores = self.play_games(training_frames, train = True)
 
-            # log training scores
-            log_train_scores.write(NL.join(map(str, training_scores)) + NL)
-            log_train_scores.flush()
+            if training_frames > 0:
+                # play number of frames with training and epsilon annealing
+                print "  Training for %d frames" % training_frames
+                training_scores = self.play_games(training_frames, train = True)
 
-            # log aggregated training data
-            train_data = (epoch, len(training_scores), sum(training_scores), np.mean(training_scores), training_frames, self.total_frames_trained, self.compute_epsilon(self.total_frames_trained), self.memory.count)
-            log_train.write(','.join(map(str, train_data)) + NL)
-            log_train.flush()
+                # log training scores
+                log_train_scores.write(NL.join(map(str, training_scores)) + NL)
+                log_train_scores.flush()
 
-            weights = self.nnet.get_weight_stats()
-            if epoch == 1:
-                # write header
-                wlayers = []
-                for (layer, index) in weights:
-                    wlayers.extend([layer, index, ''])
-                log_weights.write(','.join(wlayers) + NL)
-                wlabels = []
-                for (layer, index) in weights:
-                    wlabels.extend(['weights', 'weightsInc', 'incRatio'])
-                log_weights.write(','.join(wlabels) + NL)
-            wdata = []
-            for w in weights.itervalues():
-                wdata.extend([str(w[0]), str(w[1]), str(w[1] / w[0] if w[0] > 0 else 0)])
-            log_weights.write(','.join(wdata) + NL)
-            log_weights.flush()
+                # log aggregated training data
+                train_data = (epoch, len(training_scores), sum(training_scores), np.mean(training_scores), training_frames, self.total_frames_trained, self.compute_epsilon(self.total_frames_trained), self.memory.count)
+                log_train.write(','.join(map(str, train_data)) + NL)
+                log_train.flush()
 
-            # save network state
-            self.nnet.save_network(epoch)
-            print   # save_network()'s output doesn't include newline
+                weights = self.nnet.get_weight_stats()
+                if epoch == 1:
+                    # write header
+                    wlayers = []
+                    for (layer, index) in weights:
+                        wlayers.extend([layer, index, ''])
+                    log_weights.write(','.join(wlayers) + NL)
+                    wlabels = []
+                    for (layer, index) in weights:
+                        wlabels.extend(['weights', 'weightsInc', 'incRatio'])
+                    log_weights.write(','.join(wlabels) + NL)
+                wdata = []
+                for w in weights.itervalues():
+                    wdata.extend([str(w[0]), str(w[1]), str(w[1] / w[0] if w[0] > 0 else 0)])
+                log_weights.write(','.join(wdata) + NL)
+                log_weights.flush()
 
-            # play number of frames without training and without epsilon annealing
-            print "  Testing for %d frames" % testing_frames
-            testing_scores = self.play_games(testing_frames, train = False, epsilon = self.test_epsilon)
+                # save network state
+                self.nnet.save_network(epoch)
+                print   # save_network()'s output doesn't include newline
 
-            # log testing scores
-            log_test_scores.write(NL.join(map(str, testing_scores)) + NL)
-            log_test_scores.flush()
+            if testing_frames > 0:
+                # play number of frames without training and without epsilon annealing
+                print "  Testing for %d frames" % testing_frames
+                testing_scores = self.play_games(testing_frames, train = False, epsilon = self.test_epsilon)
 
-            # Pick random states to calculate Q-values for
-            if self.random_states is None:
-                print "  Picking %d random states for Q-values" % self.nr_random_states
-                self.random_states = self.memory.get_minibatch(self.nr_random_states)[0]
+                # log testing scores
+                log_test_scores.write(NL.join(map(str, testing_scores)) + NL)
+                log_test_scores.flush()
 
-            # calculate Q-values 
-            qvalues = self.nnet.predict(self.random_states)
-            assert qvalues.shape[0] == self.nr_random_states
-            assert qvalues.shape[1] == self.number_of_actions
-            max_qvalues = np.max(qvalues, axis = 1)
-            assert max_qvalues.shape[0] == self.nr_random_states
-            assert len(max_qvalues.shape) == 1
-            avg_qvalue = np.mean(max_qvalues)
+                # Pick random states to calculate Q-values for
+                if self.random_states is None and self.memory.count > self.nr_random_states:
+                    print "  Picking %d random states for Q-values" % self.nr_random_states
+                    self.random_states = self.memory.get_minibatch(self.nr_random_states)[0]
 
-            # log aggregated testing data
-            test_data = (epoch, len(testing_scores), sum(testing_scores), np.mean(testing_scores), avg_qvalue, testing_frames, self.test_epsilon, self.memory.count)
-            log_test.write(','.join(map(str, test_data)) + NL)
-            log_test.flush()
+                # Do not calculate Q-values when mamory is empty
+                if self.random_states is not None:
+                    # calculate Q-values 
+                    qvalues = self.nnet.predict(self.random_states)
+                    assert qvalues.shape[0] == self.nr_random_states
+                    assert qvalues.shape[1] == self.number_of_actions
+                    max_qvalues = np.max(qvalues, axis = 1)
+                    assert max_qvalues.shape[0] == self.nr_random_states
+                    assert len(max_qvalues.shape) == 1
+                    avg_qvalue = np.mean(max_qvalues)
+                else:
+                    avg_qvalue = 0
+
+                # log aggregated testing data
+                test_data = (epoch, len(testing_scores), sum(testing_scores), np.mean(testing_scores), avg_qvalue, testing_frames, self.test_epsilon, self.memory.count)
+                log_test.write(','.join(map(str, test_data)) + NL)
+                log_test.flush()
 
         log_train.close()
         log_test.close()
