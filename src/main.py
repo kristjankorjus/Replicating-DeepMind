@@ -12,6 +12,7 @@ import numpy as np
 import time
 import sys
 from os import linesep as NL
+import unittest
 
 class Main:
     # How many transitions to keep in memory?
@@ -269,6 +270,11 @@ class Main:
         log_weights.close()
 
 if __name__ == '__main__':
+
+    # Running unit tests
+    suite = unittest.TestLoader().discover('.')
+    unittest.TextTestRunner(verbosity=1).run(suite)
+
     # ignore cuda-convnet options at start of command line
     i = 1
     while (i < len(sys.argv) and sys.argv[i].startswith('--')):
