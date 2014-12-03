@@ -20,6 +20,8 @@ class SimpleDataProvider:
         assert idx >= 0 and idx < len(self.dims)
         return self.dims[idx]
 
+    def advance_batch(self):
+        pass
 
 class NeuralNet(ConvNet):
 
