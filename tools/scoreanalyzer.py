@@ -48,7 +48,10 @@ class ScoreAnalyzer:
 
 
 if __name__ == "__main__":
-    analyzer = ScoreAnalyzer(['data/origusegrads.txt',
-                              'data/forceusegrads.txt',
-                              'data/endstatefix.txt'])
+    analyzer = ScoreAnalyzer(['data/baseline.txt',
+                              'data/best.txt',
+                              'data/nesterov.txt',
+			      'data/normalized.txt',
+                              'data/preprocessing.txt',
+                              'data/origgrads.txt'])
     analyzer.plot()

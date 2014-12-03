@@ -10,7 +10,7 @@ import traceback
 
 class ALE:
     actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
-    current_reward = 0
+    current_points = 0
     next_screen = ""
     game_over = False
     memory = ""
@@ -59,7 +59,7 @@ class ALE:
         #: initialize the variables that we will start receiving from ./ale
         self.next_image = []
         self.game_over = True
-        self.current_reward = 0
+        self.current_points = 0
 
         #: initialise preprocessor
         self.preprocessor = Preprocessor()
@@ -72,7 +72,7 @@ class ALE:
         #: read from ALE:  game screen + episode info
         self.next_image, episode_info = self.fin.readline()[:-2].split(":")
         self.game_over = bool(int(episode_info.split(",")[0]))
-        self.current_reward = int(episode_info.split(",")[1])
+        self.current_points = int(episode_info.split(",")[1])
 
         #: preprocess the image and add the image to memory D using a special add function
         self.memory.add_first(self.preprocessor.process(self.next_image))
@@ -100,7 +100,9 @@ class ALE:
         Stores the action, reward and resulting image corresponding to one step
         @param action: the action that led to this transition
         """
-        self.memory.add(action, self.current_reward, self.preprocessor.process(self.next_image))
+        # TODO: does not account for negative scores
+        reward = 1 if self.current_points > 0 else 0
+        self.memory.add(action, reward, self.preprocessor.process(self.next_image))
     
     def move(self, action_index):
         """
@@ -126,5 +128,5 @@ class ALE:
             print line
             exit()
         self.game_over = bool(int(episode_info.split(",")[0]))
-        self.current_reward = int(episode_info.split(",")[1])
-        return self.current_reward
+        self.current_points = int(episode_info.split(",")[1])
+        return self.current_points

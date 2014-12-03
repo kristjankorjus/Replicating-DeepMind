@@ -147,11 +147,9 @@ class Main:
                 #print "Neural net chose action %d" % int(action)
 
             # Make the move
-            reward = self.ale.move(action)
-            if reward:
-                reward = 1
-                print "    Got reward of %d" % reward
-            game_score += reward
+            points = self.ale.move(action)
+            #print "    Got %d points" % points
+            game_score += points
             frames_played += 1
             #print "Played frame %d" % frames_played
 
