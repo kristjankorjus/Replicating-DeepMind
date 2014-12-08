@@ -9,7 +9,7 @@ import traceback
 
 
 class ALE:
-    actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4)]
+    actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4), np.uint8(11), np.uint8(12)]
     current_points = 0
     next_screen = ""
     game_over = False

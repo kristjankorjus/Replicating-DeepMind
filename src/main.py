@@ -21,8 +21,8 @@ class Main:
     # Size of the mini-batch, 32 was given in the paper
     minibatch_size = 32
 
-    # Number of possible actions in a given game, 4 for "Breakout"
-    number_of_actions = 4
+    # Number of possible actions in a given game, 6 for "Breakout"
+    number_of_actions = 6
 
     # Size of one frame
     frame_size = 84*84
