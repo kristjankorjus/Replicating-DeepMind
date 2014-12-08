@@ -16,7 +16,7 @@ import unittest
 
 class Main:
     # How many transitions to keep in memory?
-    memory_size = 1000000
+    memory_size = 500000
 
     # Size of the mini-batch, 32 was given in the paper
     minibatch_size = 32
