@@ -6,7 +6,7 @@ import os
 import numpy as np
 from preprocessor import Preprocessor
 import traceback
-
+import random
 
 class ALE:
     actions = [np.uint8(0), np.uint8(1), np.uint8(3), np.uint8(4), np.uint8(11), np.uint8(12)]
@@ -112,8 +112,12 @@ class ALE:
         #: Convert index to action
         action = self.actions[action_index]
 
+	#: Generate a random number for the action of player B
+        action_b = random.choice(range(255))
+
+
         #: Write and send to ALE stuff
-        self.fout.write(str(action)+",0\n")
+        self.fout.write(str(action)+","+str(action_b)+"\n")
         #print "sent action to ALE: ",  str(action)+",0"
         self.fout.flush()
 
