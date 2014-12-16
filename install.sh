@@ -56,3 +56,9 @@ cd ./libraries/cuda-convnet2
 
 # Go back to the main directory
 cd "$cwd"
+
+
+# -----------
+# Misc
+# ----------
+mkdir log
