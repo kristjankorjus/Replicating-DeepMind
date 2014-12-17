@@ -14,9 +14,9 @@ class ALE:
     next_screen = ""
     game_over = False
     memory = ""
-    skip_frames = 4
+    skip_frames = None
     display_screen = "true"
-    game_ROM = '../libraries/ale/roms/breakout.bin'
+    game_ROM = None
     fin = ""
     fout = ""
     preprocessor = None
