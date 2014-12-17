@@ -59,7 +59,7 @@ class Main:
 
     def __init__(self):
         self.memory = MemoryD(self.memory_size)
-        self.ale = ALE(self.memory)
+        self.ale = ALE(self.memory, display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin')
         self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4")
 
     def compute_epsilon(self, frames_played):
