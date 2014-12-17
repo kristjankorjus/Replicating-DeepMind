@@ -21,7 +21,7 @@ class ALE:
     fout = ""
     preprocessor = None
     
-    def __init__(self,  memory, display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin'):
+    def __init__(self,  memory, display_screen, skip_frames, game_ROM):
         """
         Initialize ALE class. Creates the FIFO pipes, launches ./ale and does the "handshake" phase of communication
 
