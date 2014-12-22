@@ -138,11 +138,11 @@ class Main:
 
         # We need to initialize/update the current state
         if self.current_state == None:
-            self.current_state = [first_frame, first_frame, first_frame, first_frame]
+            print "current state is none"
+            self.current_state = [first_frame.copy(),first_frame.copy(),first_frame.copy(),first_frame.copy()]
 
         else:
-            self.current_state[:3] = self.current_state[1:]
-            self.current_state[3] = first_frame
+            self.current_state = self.current_state[1:]+[first_frame]
 
 
         game_score = 0
@@ -167,21 +167,24 @@ class Main:
 
             # Make the move. Returns points received and the new state
             points, next_frame = self.ale.move(action)
+
+            # Changing points to rewards
             if points > 0:
                 print "    Got %d points" % points
+                reward = 1
+            else:
+                reward = 0
+
+            # Book keeping
             game_score += points
             frames_played += 1
             #print "Played frame %d" % frames_played
 
-            # we need to update the current state
-            #self.current_state = self.current_state[1:]+[next_frame]
-            self.current_state[3] = next_frame
+            # We need to update the current state
+            self.current_state = self.current_state[1:]+[next_frame]
 
             # Only if training
             if train:
-
-                # Binarize points
-                reward = 1 if points > 0 else 0
 
                 # Store new information to memory
                 self.memory.add(action, reward, next_frame)
@@ -217,8 +220,7 @@ class Main:
                     pass
 
                 # We need to update the current state
-                self.current_state[:3] = self.current_state[1:]
-                self.current_state[3] = first_frame
+                self.current_state = self.current_state[1:]+[first_frame]
 
         # reset the game just in case
         self.ale.end_game()
@@ -325,8 +327,8 @@ if __name__ == '__main__':
 
     # take some parameters from command line, otherwise use defaults
     epochs = int(sys.argv[i]) if len(sys.argv) > i else 100
-    training_frames = int(sys.argv[i + 1]) if len(sys.argv) > i + 1 else 50000
-    testing_frames = int(sys.argv[i + 2]) if len(sys.argv) > i + 2 else 10000
+    training_frames = int(sys.argv[i + 1]) if len(sys.argv) > i + 1 else 1000
+    testing_frames = int(sys.argv[i + 2]) if len(sys.argv) > i + 2 else 1000
 
     # run the main loop
     m = Main()
