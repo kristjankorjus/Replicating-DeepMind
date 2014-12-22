@@ -57,9 +57,12 @@ class Main:
     # Communication with ALE
     ale = None
 
+    # The last 4 frames the system has seen
+    current_state = None
+
     def __init__(self):
         self.memory = MemoryD(self.memory_size)
-        self.ale = ALE(self.memory, display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin')
+        self.ale = ALE(display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin')
         self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4")
 
     def compute_epsilon(self, frames_played):
@@ -68,7 +71,7 @@ class Main:
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         @param frames_played: How far are we with our learning?
         """
-        return max(1.0 - frames_played / self.epsilon_frames, 0.1)
+        return max(0.99 - frames_played / self.epsilon_frames, 0.1)
 
     def predict_best_action(self, last_state):
         # last_state contains only one state, so we have to convert it into batch of size 1
@@ -76,7 +79,7 @@ class Main:
 
         # use neural net to predict Q-values for all actions
         qvalues = self.nnet.predict(last_state)
-        #print "Predicted action Q-values: ", qvalues
+        print "Predicted action Q-values: ", qvalues
 
         # return action (index) with maximum Q-value
         return np.argmax(qvalues)
@@ -127,7 +130,21 @@ class Main:
         game_scores = []
 
         # Start a new game
-        self.ale.new_game()
+        first_frame = self.ale.new_game()
+        if train:
+            self.memory.add_first(first_frame)
+        else:  # if testing we dont write anything to memory
+            pass
+
+        # We need to initialize/update the current state
+        if self.current_state == None:
+            self.current_state = [first_frame, first_frame, first_frame, first_frame]
+
+        else:
+            self.current_state[:3] = self.current_state[1:]
+            self.current_state[3] = first_frame
+
+
         game_score = 0
 
         # Play games until maximum number is reached
@@ -144,25 +161,37 @@ class Main:
                 #print "Chose random action %d" % action
             # Usually neural net chooses the best action
             else:
-                action = self.predict_best_action(self.memory.get_last_state())
+                #action = self.predict_best_action(self.memory.get_last_state())
+                action = self.predict_best_action(np.ravel(self.current_state))
                 #print "Neural net chose action %d" % int(action)
 
-            # Make the move
-            points = self.ale.move(action)
+            # Make the move. Returns points received and the new state
+            points, next_frame = self.ale.move(action)
             if points > 0:
                 print "    Got %d points" % points
             game_score += points
             frames_played += 1
             #print "Played frame %d" % frames_played
 
+            # we need to update the current state
+            #self.current_state = self.current_state[1:]+[next_frame]
+            self.current_state[3] = next_frame
+
             # Only if training
             if train:
+
+                # Binarize points
+                reward = 1 if points > 0 else 0
+
                 # Store new information to memory
-                self.ale.store_step(action)
+                self.memory.add(action, reward, next_frame)
+
                 # Increase total frames only when training
                 self.total_frames_trained += 1
+
                 # Fetch random minibatch from memory
                 minibatch = self.memory.get_minibatch(self.minibatch_size)
+
                 # Train neural net with the minibatch
                 self.train_minibatch(minibatch)
                 #print "Trained minibatch of size %d" % self.minibatch_size
@@ -171,11 +200,25 @@ class Main:
             if self.ale.game_over:
                 print "    Game over, score = %d" % game_score
                 # After "game over" increase the number of games played
-                game_scores.append(game_score);
+                game_scores.append(game_score)
                 game_score = 0
+
                 # And do stuff after end game
                 self.ale.end_game()
-                self.ale.new_game()
+                if train:
+                    self.memory.add_last()
+                else:
+                    pass
+
+                first_frame = self.ale.new_game()
+                if train:
+                    self.memory.add_first(first_frame)
+                else:  # if testing we dont write anything to memory
+                    pass
+
+                # We need to update the current state
+                self.current_state[:3] = self.current_state[1:]
+                self.current_state[3] = first_frame
 
         # reset the game just in case
         self.ale.end_game()

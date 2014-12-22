@@ -13,7 +13,6 @@ class ALE:
     current_points = 0
     next_screen = ""
     game_over = False
-    memory = ""
     skip_frames = None
     display_screen = "true"
     game_ROM = None
@@ -21,11 +20,10 @@ class ALE:
     fout = ""
     preprocessor = None
     
-    def __init__(self,  memory, display_screen, skip_frames, game_ROM):
+    def __init__(self, display_screen, skip_frames, game_ROM):
         """
         Initialize ALE class. Creates the FIFO pipes, launches ./ale and does the "handshake" phase of communication
 
-        @param memory: memoryD, reference to the instance of class memoryD that collects all transitions in the game
         @param display_screen: bool, whether to show the game on screen or not
         @param skip_frames: int, number of frames to skip in the game emulator
         @param game_ROM: location of the game binary to launch with ./ale
@@ -33,7 +31,6 @@ class ALE:
 
         self.display_screen = display_screen
         self.skip_frames = skip_frames
-        self.memory = memory
         self.game_ROM = game_ROM
 
         #: create FIFO pipes
@@ -74,35 +71,28 @@ class ALE:
         self.game_over = bool(int(episode_info.split(",")[0]))
         self.current_points = int(episode_info.split(",")[1])
 
-        #: preprocess the image and add the image to memory D using a special add function
-        self.memory.add_first(self.preprocessor.process(self.next_image))
-
         #: send the fist command
         #  first command has to be 1,0 or 1,1, because the game starts when you press "fire!",
         self.fout.write("1,0\n")
         self.fout.flush()
         self.fin.readline()
-        
+
+        #: preprocess the image and add the image to memory D using a special add function
+        #self.memory.add_first(self.preprocessor.process(self.next_image))
+        return self.preprocessor.process(self.next_image)
+
     def end_game(self):
         """
         When all lives are lost, end_game adds last frame to memory resets the system
         """
         #: tell the memory that we lost
-        self.memory.add_last()
+        # self.memory.add_last() # this will be done in Main.py
         
         #: send reset command to ALE
         self.fout.write("45,45\n")
         self.fout.flush()
         self.game_over = False  # just in case, but new_game should do it anyway
-        
-    def store_step(self, action):
-        """
-        Stores the action, reward and resulting image corresponding to one step
-        @param action: the action that led to this transition
-        """
-        # TODO: does not account for negative scores
-        reward = 1 if self.current_points > 0 else 0
-        self.memory.add(action, reward, self.preprocessor.process(self.next_image))
+
     
     def move(self, action_index):
         """
@@ -133,4 +123,4 @@ class ALE:
             exit()
         self.game_over = bool(int(episode_info.split(",")[0]))
         self.current_points = int(episode_info.split(",")[1])
-        return self.current_points
+        return self.current_points, self.preprocessor.process(self.next_image)

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from src.memory.memoryd import MemoryD
+from memory.memoryd import MemoryD
 
 __author__ = 'deepmind'
 
