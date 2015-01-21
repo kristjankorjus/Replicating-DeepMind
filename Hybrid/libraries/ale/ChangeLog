@@ -1,0 +1,31 @@
+January 7th, 2013. ALE 0.4.3.
+  * Fixed a bug with ALEState's m_frame_number.
+
+June 12th, 2013. ALE 0.4.2. 
+  * Modified StellaEnvironment save/load interface to provide additional flexibility. 
+  * Series of bug fixes from Matthew Hausknecht and community.
+
+May 24th, 2013. Bug fix to ALE 0.4.1.
+  * Fixed RL-Glue syntax from OBSERVATION to OBSERVATIONS. Thanks to Angus MacIsaac for picking this bug up.
+
+May 22nd, 2013. ALE 0.4.1.
+  * Added frame skipping support directly in StellaEnvironment.
+  * Reverted default number of episodes to 10.
+
+April 22nd, 2013. ALE 0.4.0.
+  * RL-Glue support 
+  * Shared library interface
+  * Simpler direct environment interfacing
+  * Improved environment handling
+  * Improved environment customization 
+  * Better documentation
+
+October 3rd, 2012. Moving to GITHub.
+
+August 7th, 2012. ALE 0.3.1.
+  * Fixed frames per episode cap for FIFO agents, added functionality to
+    limit the total number of frames per run for FIFO agents.
+
+July 22nd, 2012. ALE 0.3.
+  * Initial ALE release.
+
