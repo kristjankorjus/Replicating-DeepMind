@@ -171,27 +171,27 @@ class Main:
 
                 # Store new information to memory
                 self.memory.add_sample(last_frame, action, reward, self.ale.game_over)
-        last_frame = next_frame
+                last_frame = next_frame
 
-        if self.memory.count >= self.minibatch_size:
-            # Fetch random minibatch from memory
-            prestates, actions, rewards, poststates, terminals = self.memory.random_chunk(self.minibatch_size)
-            #print prestates
-            b = []
-            for a in prestates:
-                b.append(np.hstack(a))
-            c = np.vstack(b)
-            # c = prestates[0,0,...] * 256
-            # print c
-            img = PIL.Image.fromarray(c)
-            img.convert("RGB").save("minibatch.png")
+                if self.memory.count >= self.minibatch_size:
+                    # Fetch random minibatch from memory
+                    prestates, actions, rewards, poststates, terminals = self.memory.random_chunk(self.minibatch_size)
+                    #print prestates
+                    b = []
+                    for a in prestates:
+                        b.append(np.hstack(a))
+                    c = np.vstack(b)
+                    # c = prestates[0,0,...] * 256
+                    # print c
+                    img = PIL.Image.fromarray(c)
+                    img.convert("RGB").save("minibatch.png")
 
-            # Train neural net with the minibatch
-            self.train_minibatch(prestates, actions, rewards, poststates)
-            # print "Trained minibatch of size %d" % self.minibatch_size
+                    # Train neural net with the minibatch
+                    self.train_minibatch(prestates, actions, rewards, poststates)
+                    # print "Trained minibatch of size %d" % self.minibatch_size
 
-            # Increase total frames only when training
-            self.total_frames_trained += 1
+                    # Increase total frames only when training
+                    self.total_frames_trained += 1
 
             # Play until game is over
             if self.ale.game_over:
