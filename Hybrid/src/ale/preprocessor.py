@@ -49,27 +49,33 @@ class Preprocessor:
         rgb = np.array(rgb)
         rgb = rgb.reshape(210, 160, 3)
 
+        gray = np.mean(rgb, axis=2)
+        sum_rows = gray[0::2,:] + gray[0::2,:]
+        sum_columns = sum_rows[:,0::2] + sum_rows[:,1::2]
+        print "compressed img", np.shape(sum_columns), np.mean(sum_columns)
+        grays = sum_columns/4.0
+
+
         # Uncomment this line to save the COLORED image
         #print "rgb shape", np.shape(rgb)
         #scipy.misc.imsave('our_best_outfile.jpg', rgb)
         #print "print mean rgb", np.mean(rgb)
 
         # Map each element of the list to the corresponding gray value
-        grays = np.asarray(map(lambda hex_val: arr[int(hex_val[1], 16) ,int(hex_val[0], 16)], hexs))
-        grays = grays.reshape((210, 160))
+        #grays = np.asarray(map(lambda hex_val: arr[int(hex_val[1], 16) ,int(hex_val[0], 16)], hexs))
+        #grays = grays.reshape((210, 160))
 
-        # following the example of Alejandro
+        # force the 80*105 image to 80*80 using cv2 as Nathan does
         resize_width = 80
-        resize_height = 105
+        resize_height = 80
         new_size = resize_width, resize_height
 
         resized = cv2.resize(grays, new_size, interpolation=cv2.INTER_LINEAR)
         resized = np.array(resized, dtype='uint8')
 
-        cropped = resized[-80:, :]
-        img = Image.fromarray(cropped)
+        img = Image.fromarray(resized)
         img.convert('RGB').save('preprocessed.png')
-        return cropped/2.0
+        return resized
 
     def get_grayscale_array(self):
         """
