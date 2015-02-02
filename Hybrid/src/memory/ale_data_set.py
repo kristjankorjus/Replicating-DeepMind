@@ -50,8 +50,6 @@ class DataSet(object):
         return max(0, (self._max_index() - self._min_index()) + 1)
 
     def add_sample(self, state, action, reward, terminal):
-        #print "adding a sample tp pos ", self.count
-        #print state
         self.states[self.count, ...] = state
         self.actions[self.count] = action
         self.rewards[self.count] = reward
@@ -78,17 +76,14 @@ class DataSet(object):
         Return the most recent phi.
         """
         phi = self._make_phi(self.count - self.phi_length)
-        return  np.array(phi, dtype=floatX)
+        return np.array(phi, dtype=floatX)
 
     def phi(self, state):
         """
         Return a phi based on the latest image, by grabbing enough
         history from the data set to fill it out.
         """
-        phi = np.empty((self.phi_length,
-                        self.states.shape[1],
-                        self.states.shape[2]),
-                       dtype=floatX)
+        phi = np.empty((self.phi_length, self.states.shape[1], self.states.shape[2]), dtype=floatX)
 
         phi[0:(self.phi_length-1), ...] = self.last_phi()[1::]
         phi[self.phi_length-1, ...] = state
@@ -99,22 +94,15 @@ class DataSet(object):
         #assert self.no_terminal(index, end_index)
         return self.states[index:end_index + 1, ...]
 
-    def random_chunk(self, chunk_size):
-        #print "taking minibatch, fro mrange: ",self._min_index(), self._max_index()+1
-        #print self._make_phi(self._max_index()-4)
-        #print self.states[:self.count]
+    def get_minibatch(self, chunk_size):
         count = 0
         # Set aside memory for the chunk
-        states = np.empty((chunk_size, self.phi_length,
-                           self.states.shape[1], self.states.shape[2]),
-                          dtype=floatX)
+        states = np.empty((chunk_size, self.phi_length, self.states.shape[1], self.states.shape[2]), dtype=floatX)
         actions = np.empty((chunk_size, 1), dtype='int32')
         rewards = np.empty((chunk_size, 1), dtype=floatX)
         terminals = np.empty((chunk_size, 1), dtype=bool)
 
-        next_states = np.empty((chunk_size, self.phi_length,
-                                self.states.shape[1],
-                                self.states.shape[2]), dtype=floatX)
+        next_states = np.empty((chunk_size, self.phi_length, self.states.shape[1], self.states.shape[2]), dtype=floatX)
 
         # Grab random samples until we have enough
         while count < chunk_size:
@@ -154,7 +142,7 @@ def simple_tests():
         print
     print "LAST PHI", dataset.last_phi()
     print
-    print 'CHUNK', dataset.random_chunk(2)
+    print 'CHUNK', dataset.get_minibatch(2)
 
 
 def speed_tests():
@@ -174,7 +162,7 @@ def speed_tests():
 
     start = time.time()
     for i in range(200):
-        a = dataset.random_chunk(32)
+        a = dataset.get_minibatch(32)
     print "batches per second: ", 200 / (time.time() - start)
 
     print dataset.last_phi()
@@ -192,7 +180,7 @@ def trivial_tests():
     dataset.add_sample(img2, 2, 2, False)
     dataset.add_sample(img3, 2, 2, True)
     print "last", dataset.last_phi()
-    print "random", dataset.random_chunk(1)
+    print "random", dataset.get_minibatch(1)
 
 
 def max_size_tests():
@@ -232,11 +220,11 @@ def test_random_chunk():
         if i > 10:
             np.random.seed(i*11 * i)
             states1, actions1, rewards1, next_states1, terminals1 = \
-                dataset1.random_chunk(10)
+                dataset1.get_minibatch(10)
 
             np.random.seed(i*11 * i)
             states2, actions2, rewards2, next_states2, terminals2 = \
-                dataset2.random_chunk(10)
+                dataset2.get_minibatch(10)
             np.testing.assert_array_almost_equal(states1, states2)
             np.testing.assert_array_almost_equal(actions1, actions2)
             np.testing.assert_array_almost_equal(rewards1, rewards2)

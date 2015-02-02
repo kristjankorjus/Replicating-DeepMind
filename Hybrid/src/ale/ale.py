@@ -108,8 +108,8 @@ class ALE:
 
         #: Write and send to ALE stuff
         self.fout.write(str(action)+","+str(action_b)+"\n")
-        print "sent action to ALE: "
-        print str(action)+","+str(action_b)+"\n"
+        #print "sent action to ALE: "
+        #print str(action)+","+str(action_b)+"\n"
         self.fout.flush()
 
         #: Read from ALE

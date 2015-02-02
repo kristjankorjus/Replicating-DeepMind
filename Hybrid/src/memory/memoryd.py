@@ -30,49 +30,37 @@ class MemoryD:
     #: global index counter
     count = None
 
-    def __init__(self, n):
+    def __init__(self, n,  img_size = 84):
         """
         Initialize memory structure 
         :type self: object
         @param n: the number of game steps we need to store
         """
+        self.img_size = img_size
         self.size = n
-        self.screens = np.empty((n, 84, 84), dtype=np.float32)
+        self.screens = np.empty((n, self.img_size, self.img_size), dtype=np.float32)
         self.actions = np.empty((n,), dtype=np.uint8)
         self.rewards = np.empty((n,), dtype=np.float32)
+        self.terminals = np.empty((n,), dtype=bool)
         self.time = np.empty((n,), dtype=np.uint32)
         self.count = -1
 
-    def add_first(self, next_screen):
-        """
-        When a new game start we add initial game screen to the memory
-        @param next_screen: 84 x 84 np.uint8 matrix
-        """
-        self.screens[(self.count + 1) % self.size] = next_screen
-        self.time[(self.count + 1) % self.size] = 0
-        self.count += 1
 
-    def add(self, action, reward, next_screen):
+    def add_sample(self, screen, action, reward, terminal):
         """
         During the game we add few thing to memory
         @param action: the action agent decided to do
         @param reward: the reward agent received for his action
         @param next_screen: next screen of the game
         """
+
+        print np.shape(action)
         self.actions[(self.count) % self.size] = action
         self.rewards[(self.count) % self.size] = reward
         self.time[(self.count + 1) % self.size] = self.time[(self.count) % self.size] + 1
-        self.screens[(self.count + 1) % self.size] = next_screen
+        self.screens[self.count % self.size] = screen
+        self.terminals[self.count % self.size] = terminal
         self.count += 1
-
-    def add_last(self):
-        """
-        When the game ends we fill memory for the current screen with corresponding
-        values. It is useful to think that at this time moment agent is looking at
-        "Game Over" screen
-        """
-        self.actions[(self.count) % self.size] = 100
-        self.rewards[(self.count) % self.size] = 100
 
     def get_minibatch(self, size):
         """
@@ -81,10 +69,11 @@ class MemoryD:
         Returns ndarray with 4 lists inside (at Tambet's request)
         @param size: size of the minibatch (in our case it should be 32)
         """
-        prestates = np.empty((size, 4, 84, 84), dtype = np.float32)
+        prestates = np.empty((size, 4, self.img_size, self.img_size), dtype = np.float32)
         actions = np.empty((size, 1), dtype=np.int32)
         rewards = np.empty((size, 1), dtype=np.float32)
-        poststates = np.empty((size, 4, 84, 84), dtype = np.float32)
+        terminals = np.empty((size, 1), dtype=np.float32)
+        poststates = np.empty((size, 4, self.img_size, self.img_size), dtype = np.float32)
 
         #: Pick random n indices and save dictionary if not terminal state
         j = 0
@@ -92,11 +81,11 @@ class MemoryD:
             i = random.randint(0, np.min([self.count, self.size]) - 1)
 
             # we don't want to take frames that are just after our rewrite point
-            while (i > (self.count % self.size) and (i-(self.count % self.size)) < 4) or self.actions[i] == 100:
+            while (i > (self.count % self.size) and (i-(self.count % self.size)) < 4) or self.terminals[i] == 100:
                 i = random.randint(0, np.min([self.count, self.size]) - 1)
 
             # add a state into the batch unless it is an endstate
-            if self.actions[i] != 100:
+            if not self.terminals[i]:
                 prestates[j, ...] = self.get_state(i)
                 actions[j] = [self.actions[i]]
                 rewards[j] = [self.rewards[i]]
@@ -105,7 +94,7 @@ class MemoryD:
             else:
                 print "We have a problem!! We selected an endstate!"
 
-        return [prestates, actions, rewards, poststates]
+        return [prestates, actions, rewards, poststates, terminals]
 
     def get_state(self, index):
         """
@@ -122,7 +111,7 @@ class MemoryD:
         pad_screens = 3 - self.time[index]
         if pad_screens > 0:
 
-            state = np.empty((4, 84, 84), dtype=np.float32)
+            state = np.empty((4, self.img_size, self.img_size), dtype=np.float32)
 
             #: Pad missing images with the first image
             for p in range(pad_screens):

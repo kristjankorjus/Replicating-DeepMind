@@ -25,7 +25,7 @@ class SimpleDataProvider:
 
 class NeuralNet(ConvNet):
 
-    def __init__(self, nr_inputs, nr_outputs, layers_file, params_file, output_layer_name):
+    def __init__(self, nr_inputs, nr_outputs, layers_file, params_file, output_layer_name, discount_factor):
         """
         Initialize a NeuralNet
 
@@ -37,6 +37,7 @@ class NeuralNet(ConvNet):
         """
 
         # Save data parameters
+        self.discount_factor = discount_factor
         self.nr_inputs = nr_inputs
         self.nr_outputs = nr_outputs
         SimpleDataProvider.dims = (nr_inputs, nr_outputs)
@@ -51,7 +52,7 @@ class NeuralNet(ConvNet):
         op, load_dic = IGPUModel.parse_options(op)
         ConvNet.__init__(self, op, load_dic)
 
-    def train(self, inputs, outputs):
+    def train(self, prestates, actions, rewards, poststates):
         """
         Train neural net with inputs and outputs.
 
@@ -60,27 +61,57 @@ class NeuralNet(ConvNet):
         @return cost?
         """
 
-        assert inputs.shape[0] == self.nr_inputs
-        assert outputs.shape[0] == self.nr_outputs
-        assert inputs.shape[1] == outputs.shape[1]
+        prestates_unravelled = map(lambda x: np.ravel(x), prestates)
+        prestates = np.transpose(prestates_unravelled).copy()
+
+        poststates_unravelled = map(lambda x: np.ravel(x), poststates)
+        poststates =  np.transpose(poststates_unravelled).copy()
+
+        actions = np.transpose(actions).copy()
+        rewards = np.transpose(rewards).copy()
+
+        assert np.shape(prestates)[0] == self.nr_inputs
+        assert np.shape(prestates)[1] == np.shape(actions)[1]
+
+        # predict Q-values for prestates, so we can keep Q-values for other actions unchanged
+        qvalues = self.q_vals(prestates,True)
+        corrected_qvalues = qvalues.copy()
+
+        # predict Q-values for poststates
+        post_qvalues = self.q_vals(poststates, True)
+
+        # take maximum Q-value of all actions
+        max_qvalues = np.max(post_qvalues, axis = 1)
+
+        # update the Q-values for the actions we actually performed
+        for i, action in enumerate(actions):
+            corrected_qvalues[i][action] = rewards[i] + self.discount_factor * max_qvalues[i]
+
+        corrected_qvalues = np.transpose(corrected_qvalues).copy()
 
         # start training in GPU
-        self.libmodel.startBatch([inputs, outputs], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
+        self.libmodel.startBatch([prestates, corrected_qvalues], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
         # wait until processing has finished
-        cost = self.libmodel.finishBatch()
-        # return cost (error)
+        cost, num_cases = self.libmodel.finishBatch()
         return cost
 
-    def predict(self, inputs):
+    def q_vals(self, inputs, minibatch=False):
         """
         Predict neural network output layer activations for input.
 
         @param inputs: NxM numpy.ndarray, where N is number of inputs and M is batch size
         """
-        assert inputs.shape[0] == self.nr_inputs
 
-        batch_size = inputs.shape[1]
+
+        if not minibatch:
+            inputs = map(lambda x: np.ravel(x), [inputs])
+            inputs = np.transpose(inputs).copy()
+
+        batch_size = np.shape(inputs)[1]
+
+        assert np.shape(inputs)[0] == self.nr_inputs
         outputs = np.zeros((batch_size, self.nr_outputs), dtype=np.float32)
+
 
         # start feed-forward pass in GPU
         self.libmodel.startFeatureWriter([inputs, outputs.transpose().copy()], [outputs], [self.output_layer_name])

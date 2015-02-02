@@ -4,9 +4,9 @@ This is the main class where all thing are put together
 
 """
 
-#from ai.NeuralNet import NeuralNet
+from ai.NeuralNet import NeuralNet
 from ai.cnn_q_learner import CNNQLearner
-#from memory.memoryd import MemoryD
+from memory.memoryd import MemoryD
 from memory.ale_data_set import DataSet
 from ale.ale import ALE
 import random
@@ -68,9 +68,8 @@ class Main:
         #self.memory = MemoryD(self.memory_size)
         self.memory = DataSet(80, 80, self.memory_size, 4)
         self.ale = ALE(display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin')
-        #self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4")
-        self.nnet = CNNQLearner(self.number_of_actions, 4, 80, 80, discount=.9, learning_rate=.0001, batch_size=32,
-                                approximator='none')
+        self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4", discount_factor= self.discount_factor)
+        #self.nnet = CNNQLearner(self.number_of_actions, 4, 80, 80, discount=self.discount_factor, learning_rate=.0001, batch_size=32, approximator='none')
 
     def compute_epsilon(self, frames_played):
         """
@@ -78,17 +77,14 @@ class Main:
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         @param frames_played: How far are we with our learning?
         """
-        return max(0.99 - frames_played / self.epsilon_frames, 0.1)
+        return max(0.9 - frames_played / self.epsilon_frames, 0.1)
 
     def predict_best_action(self, last_state):
-        # last_state contains only one state, so we have to convert it into batch of size 1
-        #last_state.shape = (last_state.shape[0], 1)
 
-        a = np.hstack(last_state)
-        img = PIL.Image.fromarray(a)
-        img.convert('RGB').save('input_to_nnet.Qvals.png')
-
-        print "last_state that goes into NNet is of shape: ", np.shape(last_state), "and of mean value:", np.mean(last_state)
+        # Uncomment this to see the 4 images that go into q_vals function
+        #a = np.hstack(last_state)
+        #img = PIL.Image.fromarray(a)
+        #img.convert('RGB').save('input_to_nnet.Qvals.png')
 
         # use neural net to predict Q-values for all actions
         qvalues = self.nnet.q_vals(last_state)
@@ -105,8 +101,7 @@ class Main:
         """
 
         cost = self.nnet.train(prestates, actions, rewards, poststates)
-        #qvalues = self.nnet.predict(prestates)
-        #print "After training: ", qvalues[0,:]
+        #print "trained network, the network thinks cost is: ", type(cost), np.shape(cost), cost
 
         return cost
 
@@ -136,17 +131,14 @@ class Main:
             # Epsilon decreases over time only when training
             if train:
                 epsilon = self.compute_epsilon(self.total_frames_trained)
-                #print "Current annealed epsilon is %f at %d frames" % (epsilon, self.total_frames_trained)
 
             # Some times random action is chosen
             if random.uniform(0, 1) < epsilon or frames_played < 4:
                 action = random.choice(range(self.number_of_actions))
-                print "Chose random action %d" % action
+
             # Usually neural net chooses the best action
             else:
-                #action = self.predict_best_action(self.memory.get_last_state())
                 action = self.predict_best_action(self.current_state)
-                print "Neural net chose action %d" % int(action)
 
             # Make the move. Returns points received and the new state
             points, next_frame = self.ale.move(action)
@@ -161,7 +153,6 @@ class Main:
             # Book keeping
             game_score += points
             frames_played += 1
-            #print "Played frame %d" % frames_played
 
             # We need to update the current state
             self.current_state = self.current_state[1:]+[next_frame]
@@ -175,20 +166,19 @@ class Main:
 
                 if self.memory.count >= self.minibatch_size:
                     # Fetch random minibatch from memory
-                    prestates, actions, rewards, poststates, terminals = self.memory.random_chunk(self.minibatch_size)
-                    #print prestates
-                    b = []
-                    for a in prestates:
-                        b.append(np.hstack(a))
-                    c = np.vstack(b)
-                    # c = prestates[0,0,...] * 256
-                    # print c
-                    img = PIL.Image.fromarray(c)
-                    img.convert("RGB").save("minibatch.png")
+                    prestates, actions, rewards, poststates, terminals = self.memory.get_minibatch(self.minibatch_size)
+
+
+                    # Uncomment this to save the minibatch as an image every time we train
+                    #b = []
+                    #for a in prestates:
+                    #    b.append(np.hstack(a))
+                    #c = np.vstack(b)
+                    #img = PIL.Image.fromarray(c)
+                    #img.convert("RGB").save("minibatch.png")
 
                     # Train neural net with the minibatch
                     self.train_minibatch(prestates, actions, rewards, poststates)
-                    # print "Trained minibatch of size %d" % self.minibatch_size
 
                     # Increase total frames only when training
                     self.total_frames_trained += 1
@@ -254,7 +244,7 @@ class Main:
                 # Pick random states to calculate Q-values for
                 if self.random_states is None and self.memory.count > self.nr_random_states:
                     print "  Picking %d random states for Q-values" % self.nr_random_states
-                    self.random_states = self.memory.random_chunk(self.nr_random_states)[0]
+                    self.random_states = self.memory.get_minibatch(self.nr_random_states)[0]
 
                 # Do not calculate Q-values when memory is empty
                 if self.random_states is not None:
