@@ -73,11 +73,21 @@ class Main:
     current_state = None
 
     def __init__(self):
+
+        # initialize memory
         #self.memory = MemoryD(self.memory_size)
         self.memory = DataSet(self.image_size, self.image_size, self.memory_size, 4)
-        self.ale = ALE(display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin', preprocess_type=self.preprocess_type)
-        #self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4", discount_factor= self.discount_factor)
-        self.nnet = CNNQLearner(self.number_of_actions, 4, self.image_size, self.image_size, discount=self.discount_factor, learning_rate=.0001, batch_size=32, approximator='none')
+
+        # initalize ALE
+        self.ale = ALE(display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin',
+                       preprocess_type=self.preprocess_type)
+
+        # initialize neural network
+        #self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg",
+        #                      "ai/deepmind-params.cfg", "layer4", discount_factor= self.discount_factor)
+        self.nnet = CNNQLearner(self.number_of_actions, 4, self.image_size, self.image_size,
+                                discount=self.discount_factor, learning_rate=.0001, batch_size=32,
+                                approximator='cuda_conv')
 
     def compute_epsilon(self, frames_played):
         """
