@@ -28,8 +28,16 @@ class Main:
     # Number of possible actions in a given game, 6 for "Breakout"
     number_of_actions = 18
 
+    preprocess_type = "cropped_80"
+
+    #image width/height
+    if preprocess_type == "article":
+        image_size = 84
+    else:
+        image_size = 80
+
     # Size of one frame
-    frame_size = 80*80
+    frame_size = image_size*image_size
 
     # Size of one state is four 80x80 screens
     state_size = 4 * frame_size
@@ -66,10 +74,10 @@ class Main:
 
     def __init__(self):
         #self.memory = MemoryD(self.memory_size)
-        self.memory = DataSet(80, 80, self.memory_size, 4)
-        self.ale = ALE(display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin')
-        self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4", discount_factor= self.discount_factor)
-        #self.nnet = CNNQLearner(self.number_of_actions, 4, 80, 80, discount=self.discount_factor, learning_rate=.0001, batch_size=32, approximator='none')
+        self.memory = DataSet(self.image_size, self.image_size, self.memory_size, 4)
+        self.ale = ALE(display_screen="true", skip_frames=4, game_ROM='../libraries/ale/roms/breakout.bin', preprocess_type=self.preprocess_type)
+        #self.nnet = NeuralNet(self.state_size, self.number_of_actions, "ai/deepmind-layers.cfg", "ai/deepmind-params.cfg", "layer4", discount_factor= self.discount_factor)
+        self.nnet = CNNQLearner(self.number_of_actions, 4, self.image_size, self.image_size, discount=self.discount_factor, learning_rate=.0001, batch_size=32, approximator='none')
 
     def compute_epsilon(self, frames_played):
         """

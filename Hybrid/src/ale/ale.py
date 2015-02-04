@@ -20,7 +20,7 @@ class ALE:
     fout = ""
     preprocessor = None
     
-    def __init__(self, display_screen, skip_frames, game_ROM):
+    def __init__(self, display_screen, skip_frames, game_ROM, preprocess_type):
         """
         Initialize ALE class. Creates the FIFO pipes, launches ./ale and does the "handshake" phase of communication
 
@@ -32,6 +32,7 @@ class ALE:
         self.display_screen = display_screen
         self.skip_frames = skip_frames
         self.game_ROM = game_ROM
+        self.preprocess_type = preprocess_type
 
         #: create FIFO pipes
         os.system("mkfifo ale_fifo_out")
@@ -59,7 +60,7 @@ class ALE:
         self.current_points = 0
 
         #: initialise preprocessor
-        self.preprocessor = Preprocessor()
+        self.preprocessor = Preprocessor(self.preprocess_type)
 
     def new_game(self):
         """

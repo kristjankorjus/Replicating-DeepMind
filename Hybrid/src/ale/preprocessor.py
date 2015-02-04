@@ -12,28 +12,34 @@ import scipy
 class Preprocessor:
 
     grayscale_array = None
-    desired_image_size = 80         # the size of the new image will be desired_image_size x desired_image_size
+    desired_image_size = None         # the size of the new image will be desired_image_size x desired_image_size
 
-    def __init__(self):
+    def __init__(self, preprocess_type):
         """
         Initialise preprocessor
         """
-        self.grayscale_array = self.get_grayscale_array()
+
         self.NTSC = self.ALE_NTSC_palette()
+        if preprocess_type == "article":
+            self.desired_image_size = 84
+        elif preprocess_type == "cropped_80":
+            self.desired_image_size = 80
+            self.cropped = True
+        elif preprocess_type == "resized_80":
+            self.desired_image_size = 80
+            self.cropped = False
+        else:
+            print "unknown preprocess type"
 
     def process(self, image_string):
         """
         Returns the cropped, downscaled, grayscale array representation of the image.
         @param image_string: a string that ALE outputs, corresponding to a 160x210 color image
         """
-        arr = self.grayscale_array
 
-        # Crop irrelevant lines from beginning and end
-        #cropped = image_string[160*33*2:160*193*2]
-        cropped = image_string
-
-        # Split cropped image string into a list of hex codes
-        hexs = [cropped[i*2:i*2+2] for i in range(len(cropped)/2)]
+        # Split cropped image string into a list of hex codes,
+        # then get the corresponding color_values(integers) from NTSC table
+        hexs = [image_string[i*2:i*2+2] for i in range(len(image_string)/2)]
         colors = np.asarray(map(lambda hex_val: self.NTSC[int(hex_val, 16)], hexs))
 
         r = []
@@ -49,50 +55,48 @@ class Preprocessor:
         rgb = np.array(rgb)
         rgb = rgb.reshape(210, 160, 3)
 
+        # average over R, G and B
         gray = np.mean(rgb, axis=2)
-        sum_rows = gray[0::2,:] + gray[0::2,:]
-        sum_columns = sum_rows[:,0::2] + sum_rows[:,1::2]
-        print "compressed img", np.shape(sum_columns), np.mean(sum_columns)
-        grays = sum_columns/4.0
+
+        if self.desired_image_size == 84:
+            resized = cv2.resize(gray, (84, 110), interpolation=cv2.INTER_LINEAR)
+            # Nathan suggests to crop 8 lines of his 105.. we have 110 lines
+            final_shape = resized[110-84-8:110-8, :]
+
+        else:
+            # in the case of using 80x80, we start by averaging 4 pixels as in deep_q_l
+            # take the average of 4 pixels
+            sum_rows = gray[0::2, :] + gray[0::2,:]
+            sum_columns = sum_rows[:, 0::2] + sum_rows[:, 1::2]
+            grays = sum_columns/4.0
 
 
-        # Uncomment this line to save the COLORED image
+            if not self.cropped:
+            # force the 80*105 image to 80*80 using cv2 as Nathan does
+                new_size = self.desired_image_size, self.desired_image_size
+                resized = cv2.resize(grays, new_size, interpolation=cv2.INTER_LINEAR)
+                final_shape = np.array(resized, dtype='uint8')
+
+            else:
+                # The case if choose to crop and not force the image into new shape with OpenCV
+                # Nathan suggests that in Breakout we cut off 8 lines from the bottom
+                lower_cut_off = 8
+                lower_bound = 105 - lower_cut_off
+                higher_bound = lower_bound - self.desired_image_size
+                final_shape = grays[higher_bound: lower_bound, :]
+
+        # Uncomment this section to save the COLORED image
         #print "rgb shape", np.shape(rgb)
         #scipy.misc.imsave('our_best_outfile.jpg', rgb)
         #print "print mean rgb", np.mean(rgb)
 
-        # Map each element of the list to the corresponding gray value
-        #grays = np.asarray(map(lambda hex_val: arr[int(hex_val[1], 16) ,int(hex_val[0], 16)], hexs))
-        #grays = grays.reshape((210, 160))
+        # Uncomment this section to save the proprocessed image
+        #print np.shape(final_shape)
+        #img = Image.fromarray(final_shape)
+        #img.convert('RGB').save('preprocessed.png')
 
-        # force the 80*105 image to 80*80 using cv2 as Nathan does
-        resize_width = 80
-        resize_height = 80
-        new_size = resize_width, resize_height
+        return final_shape
 
-        resized = cv2.resize(grays, new_size, interpolation=cv2.INTER_LINEAR)
-        resized = np.array(resized, dtype='uint8')
-
-        img = Image.fromarray(resized)
-        img.convert('RGB').save('preprocessed.png')
-        return resized
-
-    def get_grayscale_array(self):
-        """
-        Returns the (numpy) array that is used for mapping NTSC colors to grayscale values
-        """
-        
-        my_array = np.array(
-            [[0.000000000000000000e+00, 4.533333333333333570e+01, 5.066666666666666430e+01, 5.200000000000000000e+01, 4.533333333333333570e+01, 7.066666666666667140e+01, 6.400000000000000000e+01, 5.066666666666666430e+01, 4.533333333333333570e+01, 4.933333333333333570e+01, 4.533333333333333570e+01, 3.466666666666666430e+01, 2.000000000000000000e+01, 2.533333333333333215e+01, 3.066666666666666785e+01, 3.600000000000000000e+01],
-            [6.400000000000000000e+01, 7.200000000000000000e+01, 7.333333333333332860e+01, 7.600000000000000000e+01, 7.333333333333332860e+01, 9.600000000000000000e+01, 9.066666666666667140e+01, 7.733333333333332860e+01, 7.200000000000000000e+01, 7.600000000000000000e+01, 7.466666666666667140e+01, 6.400000000000000000e+01, 5.200000000000000000e+01, 5.733333333333333570e+01, 6.133333333333333570e+01, 6.533333333333332860e+01],
-            [1.080000000000000000e+02, 1.000000000000000000e+02, 9.466666666666667140e+01, 1.000000000000000000e+02, 9.866666666666667140e+01, 1.186666666666666714e+02, 1.146666666666666714e+02, 1.026666666666666714e+02, 9.866666666666667140e+01, 1.026666666666666714e+02, 1.013333333333333286e+02, 9.333333333333332860e+01, 8.400000000000000000e+01, 8.666666666666667140e+01, 8.933333333333332860e+01, 9.466666666666667140e+01],
-            [1.440000000000000000e+02, 1.240000000000000000e+02, 1.173333333333333286e+02, 1.226666666666666714e+02, 1.226666666666666714e+02, 1.400000000000000000e+02, 1.373333333333333428e+02, 1.280000000000000000e+02, 1.213333333333333286e+02, 1.266666666666666714e+02, 1.280000000000000000e+02, 1.213333333333333286e+02, 1.133333333333333286e+02, 1.133333333333333286e+02, 1.160000000000000000e+02, 1.200000000000000000e+02],
-            [1.760000000000000000e+02, 1.440000000000000000e+02, 1.346666666666666572e+02, 1.426666666666666572e+02, 1.440000000000000000e+02, 1.600000000000000000e+02, 1.586666666666666572e+02, 1.480000000000000000e+02, 1.426666666666666572e+02, 1.480000000000000000e+02, 1.506666666666666572e+02, 1.440000000000000000e+02, 1.373333333333333428e+02, 1.386666666666666572e+02, 1.413333333333333428e+02, 1.426666666666666572e+02],
-            [2.000000000000000000e+02, 1.653333333333333428e+02, 1.520000000000000000e+02, 1.613333333333333428e+02, 1.653333333333333428e+02, 1.773333333333333428e+02, 1.773333333333333428e+02, 1.693333333333333428e+02, 1.626666666666666572e+02, 1.666666666666666572e+02, 1.720000000000000000e+02, 1.680000000000000000e+02, 1.626666666666666572e+02, 1.613333333333333428e+02, 1.640000000000000000e+02, 1.653333333333333428e+02],
-            [2.200000000000000000e+02, 1.853333333333333428e+02, 1.680000000000000000e+02, 1.773333333333333428e+02, 1.853333333333333428e+02, 1.946666666666666572e+02, 1.960000000000000000e+02, 1.880000000000000000e+02, 1.813333333333333428e+02, 1.866666666666666572e+02, 1.933333333333333428e+02, 1.880000000000000000e+02, 1.853333333333333428e+02, 1.840000000000000000e+02, 1.840000000000000000e+02, 1.866666666666666572e+02],
-            [2.360000000000000000e+02, 2.026666666666666572e+02, 1.853333333333333428e+02, 1.960000000000000000e+02, 2.040000000000000000e+02, 2.120000000000000000e+02, 2.133333333333333428e+02, 2.066666666666666572e+02, 2.000000000000000000e+02, 2.053333333333333428e+02, 2.133333333333333428e+02, 2.093333333333333428e+02, 2.066666666666666572e+02, 2.053333333333333428e+02, 2.053333333333333428e+02, 2.053333333333333428e+02]]
-        )
-        return my_array
 
     def ALE_NTSC_palette(self):
         ourNTSCPalette = [0x000000, 0, 0x4a4a4a, 0, 0x6f6f6f, 0, 0x8e8e8e, 0,
