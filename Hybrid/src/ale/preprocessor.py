@@ -19,7 +19,9 @@ class Preprocessor:
         Initialise preprocessor
         """
 
-        self.NTSC = self.ALE_NTSC_palette()
+        self.NTSC, self.NTSC_grayscale = self.ALE_NTSC_palette()
+        print "grayscale looks like this: ",self.NTSC_grayscale
+
         if preprocess_type == "article":
             self.desired_image_size = 84
         elif preprocess_type == "cropped_80":
@@ -40,23 +42,8 @@ class Preprocessor:
         # Split cropped image string into a list of hex codes,
         # then get the corresponding color_values(integers) from NTSC table
         hexs = [image_string[i*2:i*2+2] for i in range(len(image_string)/2)]
-        colors = np.asarray(map(lambda hex_val: self.NTSC[int(hex_val, 16)], hexs))
-
-        r = []
-        g = []
-        b = []
-        rgb = []
-        for cc in colors:
-            r.append((cc >> 16) & 0xff)
-            g.append((cc >> 8) & 0xff)
-            b.append(cc & 0xff)
-            rgb.append([r[-1], g[-1], b[-1]])
-
-        rgb = np.array(rgb)
-        rgb = rgb.reshape(210, 160, 3)
-
-        # average over R, G and B
-        gray = np.mean(rgb, axis=2)
+        gray = np.asarray(map(lambda hex_val: self.NTSC_grayscale[int(hex_val, 16)], hexs))
+        gray = gray.reshape(210, 160)
 
         if self.desired_image_size == 84:
             resized = cv2.resize(gray, (84, 110), interpolation=cv2.INTER_LINEAR)
@@ -85,15 +72,10 @@ class Preprocessor:
                 higher_bound = lower_bound - self.desired_image_size
                 final_shape = grays[higher_bound: lower_bound, :]
 
-        # Uncomment this section to save the COLORED image
-        #print "rgb shape", np.shape(rgb)
-        #scipy.misc.imsave('our_best_outfile.jpg', rgb)
-        #print "print mean rgb", np.mean(rgb)
-
         # Uncomment this section to save the proprocessed image
         #print np.shape(final_shape)
         #img = Image.fromarray(final_shape)
-        #img.convert('RGB').save('preprocessed.png')
+        # img.convert('RGB').save('preprocessed.png')
 
         return final_shape
 
@@ -131,4 +113,14 @@ class Preprocessor:
                           0xa0ab4f, 0, 0xb7c25f, 0, 0xccd86e, 0, 0xe0ec7c, 0,
                           0x482c00, 0, 0x694d14, 0, 0x866a26, 0, 0xa28638, 0,
                           0xbb9f47, 0, 0xd2b656, 0, 0xe8cc63, 0, 0xfce070, 0]
-        return ourNTSCPalette
+
+        ourNTSCGrayscale=[0]*256
+        for i in range(len(ourNTSCPalette)):
+            integer = ourNTSCPalette[i]
+            r = ((integer >> 16) & 0xff)
+            g = ((integer >> 8) & 0xff)
+            b = (integer & 0xff)
+
+            ourNTSCGrayscale[i] = (r+g+b)/3.0
+
+        return ourNTSCPalette, ourNTSCGrayscale

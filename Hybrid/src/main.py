@@ -95,7 +95,7 @@ class Main:
         with annealed linearly from 1 to 0.1 over the first million frames, and fixed at 0.1 thereafter."
         @param frames_played: How far are we with our learning?
         """
-        return max(0.9 - frames_played / self.epsilon_frames, 0.1)
+        return max(0.99 - frames_played / self.epsilon_frames, 0.1)
 
     def predict_best_action(self, last_state):
 
@@ -177,7 +177,6 @@ class Main:
 
             # Only if training
             if train:
-
                 # Store new information to memory
                 self.memory.add_sample(last_frame, action, reward, self.ale.game_over)
                 last_frame = next_frame
