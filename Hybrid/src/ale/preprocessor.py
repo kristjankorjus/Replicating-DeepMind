@@ -19,8 +19,7 @@ class Preprocessor:
         Initialise preprocessor
         """
 
-        self.NTSC, self.NTSC_grayscale = self.ALE_NTSC_palette()
-        print "grayscale looks like this: ",self.NTSC_grayscale
+        self.NTSC, self.NTSC_grayscale, self.hex_dict = self.ALE_NTSC_palette()
 
         if preprocess_type == "article":
             self.desired_image_size = 84
@@ -42,8 +41,9 @@ class Preprocessor:
         # Split cropped image string into a list of hex codes,
         # then get the corresponding color_values(integers) from NTSC table
         hexs = [image_string[i*2:i*2+2] for i in range(len(image_string)/2)]
-        gray = np.asarray(map(lambda hex_val: self.NTSC_grayscale[int(hex_val, 16)], hexs))
-        gray = gray.reshape(210, 160)
+        gray = [self.hex_dict[h] for h in hexs]
+        # gray = [self.NTSC_grayscale[int(h, 16)] for h in hexs] # seems to be slower
+        gray = np.reshape(gray, (210, 160))
 
         if self.desired_image_size == 84:
             resized = cv2.resize(gray, (84, 110), interpolation=cv2.INTER_LINEAR)
@@ -114,7 +114,7 @@ class Preprocessor:
                           0x482c00, 0, 0x694d14, 0, 0x866a26, 0, 0xa28638, 0,
                           0xbb9f47, 0, 0xd2b656, 0, 0xe8cc63, 0, 0xfce070, 0]
 
-        ourNTSCGrayscale=[0]*256
+        ourNTSCGrayscale = [0]*256
         for i in range(len(ourNTSCPalette)):
             integer = ourNTSCPalette[i]
             r = ((integer >> 16) & 0xff)
@@ -123,4 +123,12 @@ class Preprocessor:
 
             ourNTSCGrayscale[i] = (r+g+b)/3.0
 
-        return ourNTSCPalette, ourNTSCGrayscale
+        hex_dict = {}
+        for first_hex in ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']:
+            for second_hex in ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']:
+                integer = int(first_hex+second_hex,16)
+                hex_dict[first_hex+second_hex] = ourNTSCGrayscale[integer]
+
+        # print hex_dict
+
+        return ourNTSCPalette, ourNTSCGrayscale, hex_dict
