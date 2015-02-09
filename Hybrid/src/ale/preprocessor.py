@@ -77,7 +77,8 @@ class Preprocessor:
         #img = Image.fromarray(final_shape)
         # img.convert('RGB').save('preprocessed.png')
 
-        return final_shape
+
+        return final_shape.astype('f')#final_shape
 
 
     def ALE_NTSC_palette(self):

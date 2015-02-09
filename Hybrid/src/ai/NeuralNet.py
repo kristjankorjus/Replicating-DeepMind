@@ -8,6 +8,7 @@ from convnet import *
 import numpy as np
 import time
 from collections import OrderedDict
+import pylab
 
 class SimpleDataProvider:
     dims = None
@@ -61,11 +62,16 @@ class NeuralNet(ConvNet):
         @return cost?
         """
 
+        self.sync_with_host()
+
+        #print "training: \n"
         prestates_unravelled = map(lambda x: np.ravel(x), prestates)
         prestates = np.transpose(prestates_unravelled).copy()
+        prestates = prestates/256.0
 
         poststates_unravelled = map(lambda x: np.ravel(x), poststates)
         poststates =  np.transpose(poststates_unravelled).copy()
+        poststates = poststates/256.0
 
         actions = np.transpose(actions).copy()
         rewards = np.transpose(rewards).copy()
@@ -81,13 +87,18 @@ class NeuralNet(ConvNet):
         post_qvalues = self.q_vals(poststates, True)
 
         # take maximum Q-value of all actions
-        max_qvalues = np.max(post_qvalues, axis = 1)
+        max_qvalues = np.max(post_qvalues, axis=1)
 
+        #print "max ", max_qvalues
         # update the Q-values for the actions we actually performed
-        for i, action in enumerate(actions):
-            corrected_qvalues[i][action] = rewards[i] + self.discount_factor * max_qvalues[i]
+        for i, action in enumerate(actions[0]):
+            corrected_qvalues[i][action] = rewards[0][i] + self.discount_factor * max_qvalues[i]
 
         corrected_qvalues = np.transpose(corrected_qvalues).copy()
+
+        #print "theoretical cost:", np.sum((qvalues - corrected_qvalues.T)**2)
+
+        #print "corrected qvals", type(corrected_qvalues[0][0])
 
         # start training in GPU
         self.libmodel.startBatch([prestates, corrected_qvalues], 1, False) # second parameter is 'progress', third parameter means 'only test, don't train'
@@ -104,19 +115,34 @@ class NeuralNet(ConvNet):
 
 
         if not minibatch:
-            inputs = map(lambda x: np.ravel(x), [inputs])
-            inputs = np.transpose(inputs).copy()
+            inputs = np.ravel(inputs)
+            inputs = np.transpose([inputs]).copy()/256.0
 
+        #print np.shape(inputs), type(inputs), type(inputs[0][0])
         batch_size = np.shape(inputs)[1]
 
         assert np.shape(inputs)[0] == self.nr_inputs
         outputs = np.zeros((batch_size, self.nr_outputs), dtype=np.float32)
-
-
         # start feed-forward pass in GPU
         self.libmodel.startFeatureWriter([inputs, outputs.transpose().copy()], [outputs], [self.output_layer_name])
         # wait until processing has finished
         self.libmodel.finishBatch()
+
+        # if for diagnostics you want to print the activities in other layers too :
+        #outputs1 = np.zeros((batch_size, 6400), dtype=np.float32)
+        #outputs2 = np.zeros((batch_size, 9*9*32), dtype=np.float32)
+        #outputs3 = np.zeros((batch_size, 256), dtype=np.float32)
+
+        #self.libmodel.startFeatureWriter([inputs, outputs1.T.copy()], [outputs1], ["layer1"])
+        #self.libmodel.finishBatch()
+        #self.libmodel.startFeatureWriter([inputs, outputs2.T.copy()], [outputs2], ["layer2"])
+        #self.libmodel.finishBatch()
+        #self.libmodel.startFeatureWriter([inputs, outputs3.T.copy()], [outputs3], ["layer3"])
+        #self.libmodel.finishBatch()
+
+        #print "the average activities in the layers are: ", np.mean(outputs1), np.mean(outputs2), np.mean(outputs3), np.mean(np.abs(outputs))
+        #pylab.hist(outputs.ravel())
+        #pylab.show()
 
         # now activations of output layer should be in 'outputs'
         return outputs
